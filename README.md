@@ -19,7 +19,7 @@ The modul can display a temperatur graph by the help of rrdtool.
 # Installation
 is a bit tricky:
 
-Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
+## Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
 
 (1)-- sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
 
@@ -36,7 +36,8 @@ Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
         
 Install rrdtool for python:
 
-You can install it with the Raspi software insataller:
+## You can install it with the Raspi software installer:
+
 (1)--Goto options/Einstellungen
 
 (2)--Add / Remove Software
@@ -50,7 +51,9 @@ You can install it with the Raspi software insataller:
 rrdtool should be installed.
 
 # Usage
+
 Shows the temp sensor of the Kettle (ID) in TFT_Display_Kettle_ID in parameters.
 
 # Known Problems
-TFT_Display_hight and TFT_Display_with is not used 
+
+TFT_Display_hight and TFT_Display_with in parameters is currently not used 
