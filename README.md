@@ -18,6 +18,11 @@ The modul can display a temperatur graph by the help of rrdtool.
 
 # Installation
 is a bit tricky:
+You have to install the dafruit_Pyton_ILI9341 and some other packages.
+Most of them are already insatlled but they all have to be present.
+At the end the rrdtool has to be installed wit the Raspi software-installer.
+In the end you have to install the addon.
+Dont forget the reboot.
 
 ## Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
 
@@ -49,6 +54,10 @@ Install rrdtool for python:
 (5)--hit apply
 
 rrdtool should be installed.
+
+## You have to clon the Addon (as long as ist is not offical)
+
+git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
 # Usage
 
