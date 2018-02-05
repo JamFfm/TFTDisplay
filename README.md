@@ -1,5 +1,5 @@
 # TFTDisplay
-CraftbeerPi3 addon for a 2.2" TFT Display 320x240 with ILI9341 driver
+CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
 
 With this add-on you can display something on a 240 x 320 TFT SPI Display.
 It is based on the ILI9341 controller.
@@ -14,8 +14,27 @@ https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
 Please do not update your Firmware. I will distroy thr Raspi configuration (not the hardware).
 I noticed that you need first initialise with DC 18 and RST 23. This causes a white screen. After that change to DC 24 and RST 25. The latter is the GPIO I connected.
 
-Until now only the Craftbeerlogo is displayed with a bit Text. 
-![CraftBerrPi Logo](/home/pi/craftbeerpi3/modules/ui/static/logo.png)
+The modul can display a temperatur graph by the help of rrdtool.
 
+# Installation
+is a bit tricky:
 
-In the future the display may display a Temp Graph of the Mask or fermentation
+Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
+
+sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
+sudo pip install pathlib
+sudo pip install RPi.GPIO
+sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
+cd Adafruit_Python_ILI9341
+sudo python setup.py install
+        
+Install rrdtool for python:
+
+You can install it with the Raspi software insataller:
+Goto options/Einstellungen
+Add / Remove Software
+Key in "rrdtools" and hit enter
+choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
+hit apply
+rrdtool should be installed.
+
