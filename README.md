@@ -26,32 +26,34 @@ Dont forget the reboot.
 
 ## Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
 
-(1)-- sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
+(1)-- cd craftbeerpi3
 
-(2)-- sudo pip install pathlib
+(2)-- sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
 
-(3)-- sudo pip install RPi.GPIO
+(3)-- sudo pip install pathlib
 
-(4)-- sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
+(4)-- sudo pip install RPi.GPIO
 
-(5)-- cd Adafruit_Python_ILI9341
+(5)-- sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
 
-(6)-- sudo python setup.py install
+(6)-- cd Adafruit_Python_ILI9341
+
+(7)-- sudo python setup.py install
 
         
 Install rrdtool for python:
 
 ## You can install it with the Raspi software installer:
 
-(1)--Goto options/Einstellungen
+(1)-- Goto options/Einstellungen
 
-(2)--Add / Remove Software
+(2)-- Add / Remove Software
 
-(3)--Key in "rrdtools" and hit enter
+(3)-- Key in "rrdtools" and hit enter
 
-(4)--choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
+(4)-- choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
 
-(5)--hit apply
+(5)-- hit apply
 
 rrdtool should be installed.
 
