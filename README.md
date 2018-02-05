@@ -21,12 +21,12 @@ is a bit tricky:
 
 Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
 
-(1)--sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
-(2)--sudo pip install pathlib
-(3)--sudo pip install RPi.GPIO
-(4)--sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
-(5)--cd Adafruit_Python_ILI9341
-(6)--sudo python setup.py install
+(1)-- sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
+(2)-- sudo pip install pathlib
+(3)-- sudo pip install RPi.GPIO
+(4)-- sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
+(5)-- cd Adafruit_Python_ILI9341
+(6)-- sudo python setup.py install
         
 Install rrdtool for python:
 
