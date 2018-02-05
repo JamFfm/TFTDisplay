@@ -49,3 +49,8 @@ You can install it with the Raspi software insataller:
 
 rrdtool should be installed.
 
+# Usage
+Shows the temp sensor of the Kettle (ID) in TFT_Display_Kettle_ID in parameters.
+
+# Known Problems
+TFT_Display_hight and TFT_Display_with is not used 
