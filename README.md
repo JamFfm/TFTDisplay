@@ -8,8 +8,9 @@ It is based on the ILI9341 controller.
 http://blog.riyas.org/2014/07/
 I put a 48 Ohm resistor inbetween LCD and the Raspi Pin.
 ![GitHub Logo](/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/gpio_connectio_to_tft_il9341.png)
+BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
 
-(2)-- I followed how to install and run it:
+(2)-- I followed this page how to install and run it:
 https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
 Please do not update your Firmware. I will distroy thr Raspi configuration (not the hardware).
 I noticed that you need first initialise with DC 18 and RST 23. This causes a white screen. After that change to DC 24 and RST 25. The latter is the GPIO I connected.
