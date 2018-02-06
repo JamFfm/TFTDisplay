@@ -1,4 +1,4 @@
-# TFTDisplay
+# TFTDisplay (BETA)
 CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
 
 With this add-on you can display something on a 240 x 320 TFT SPI Display.
@@ -21,9 +21,9 @@ The modul can display a temperatur graph by the help of rrdtool.
 
 # Installation
 is a bit tricky:
-You have to install the dafruit_Pyton_ILI9341 and some other packages.
-Most of them are already insatlled but they all have to be present.
-At the end the rrdtool has to be installed wit the Raspi software-installer.
+You have to install the Adafruit_Pyton_ILI9341 and some other packages.
+Most of them are already installed but they all have to be present.
+At the end the rrdtool has to be installed with the Raspi software-installer.
 In the end you have to install the addon.
 Dont forget the reboot.
 
@@ -60,7 +60,7 @@ Install rrdtool for python:
 
 rrdtool should be installed.
 
-## You have to clon the Addon (as long as ist is not offical)
+## You have to clone the Addon (as long as ist is not offical)
 
 git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
