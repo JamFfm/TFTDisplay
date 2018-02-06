@@ -4,6 +4,8 @@ CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
 With this add-on you can display something on a 240 x 320 TFT SPI Display.
 It is based on the ILI9341 controller.
 
+(https://github.com/JamFfm/TFTDisplay/blob/master/TFT%20Graph.jpg)
+
 (1)--I followed this how to wiring
 http://blog.riyas.org/2014/07/
 I put a 48 Ohm resistor inbetween LCD and the Raspi Pin.
