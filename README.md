@@ -7,7 +7,7 @@ It is based on the ILI9341 controller.
 (1)--I followed this how to wiring
 http://blog.riyas.org/2014/07/
 I put a 48 Ohm resistor inbetween LCD and the Raspi Pin.
-![GitHub Logo](/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/gpio_connectio_to_tft_il9341.png)
+(/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/gpio_connectio_to_tft_il9341.png)
 BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
 
 (2)-- I followed this page how to install and run it:
