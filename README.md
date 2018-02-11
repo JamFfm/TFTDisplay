@@ -6,10 +6,12 @@ It is based on the ILI9341 controller.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
-(1)--I followed this how to wiring
+(1)--I followed this for wiring
 http://blog.riyas.org/2014/07/
-I put a 48 Ohm resistor inbetween LCD and the Raspi Pin.
+BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
+I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
 (/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/gpio_connectio_to_tft_il9341.png)
+![](https://github.com/JamFfm/TFTDisplay/blob/master/gpio_connectio_to_tft_il9341.png "Wiring TFT <->PI")
 BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
 
 (2)-- I followed this page how to install and run it:
