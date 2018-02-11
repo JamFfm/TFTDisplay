@@ -72,10 +72,9 @@ def TFT240x320():
     disp.begin()
 
     # Load default font.
-    font = ImageFont.load_default()
+    #font = ImageFont.load_default()
         
     # Load an image
-    #imagefile = ('/home/pi/craftbeerpi3/modules/ui/static/logo.png')
     imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
     image = Image.open(imagefile)
     #cbpi.app.logger.info('Loading image %s' % (imagefile))
@@ -90,7 +89,7 @@ def TFT240x320():
 
     # Draw the image on the display hardware.
     disp.display(image)
-    cbpi.app.logger.info('image display')
+    #cbpi.app.logger.info('image display')
 
 def createRRDdatabase():
     rrdtool.create(
@@ -105,21 +104,23 @@ def updateRRDdatabase():
     pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd")
     cbpi.app.logger.info(pfad)
     rrdtool.update("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd", "N:%s" % (Temp()));
-    cbpi.app.logger.info('rrd update')
+    #cbpi.app.logger.info('rrd update')
 	
 def graphAsFile():
     path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png"
     rrdtool.graph (path,
 	"--imgformat", "PNG",
     	"--start", "-40m",
-        #"-w %s" % (TFTh()),
-        #"-h %s" % (TFTw()),
-        #"%s" % TFTh(),
-        #"%s" % TFTw(),
-        "-w 290", "-h 310",
+        "--font", "DEFAULT:14",        
+        #"--x-grid", "none",
+        "--grid-dash", "0:10",
+        "%s" % (TFTh()), "%s" % (TFTw()),
+        #"-w 290", "-h 310",                   
+        #"--full-size-mode",
+        "--no-gridfit",
     	"DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd:sensor1:AVERAGE",
-    	"LINE3:temp#ff0000:sensor1")
-    cbpi.app.logger.info('graph created')
+    	"LINE2:temp#ff0000:sensor1")
+    #cbpi.app.logger.info('graph created')
 
 def rrdDateiVorhanden():
     my_file = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd")
@@ -142,22 +143,23 @@ def set_parameter_id2():
     TFTid = cbpi.get_config_parameter("TFTDisplay_Kettle_ID",None)
     if TFTid is None:
         cbpi.add_config_parameter("TFTDisplay_Kettle_ID", 1, "number", "Choose Kettle (Number), CBPi reboot required")
-        TFTid = cbpi.get_config_parameter("TFTDisplay_Kettle_ID",None)
-        cbpi.app.logger.info("TFTid%s" % (TFTid))
+        TFTid = cbpi.get_config_parameter("TFTDisplay_Kettle_ID",None)        
+    cbpi.app.logger.info("TFTid%s" % (TFTid))
     return TFTid
+    
 
 def TFTh():  
-    TFThoehe = cbpi.get_config_parameter("TFTDisplay_hight",None)
+    TFThoehe = str(cbpi.get_config_parameter("TFTDisplay_hight",None))
     if TFThoehe is None:
-        cbpi.add_config_parameter("TFTDisplay_hight", 290, "number", "Choose TFTDisplay hight, CBPi reboot required")
+        cbpi.add_config_parameter("TFTDisplay_hight", 290, "number", "Choose TFTDisplay hight, recommendation 290, NO! CBPi reboot required")
         TFThoehe = str(cbpi.get_config_parameter("TFTDisplay_hight",None))
         cbpi.app.logger.info("TFThoehe: %s" % (TFThoehe))
     return ("-w %s" % TFThoehe)
 
 def TFTw():  
-    TFTbr = cbpi.get_config_parameter("TFTDisplay_width",None)
+    TFTbr = str(cbpi.get_config_parameter("TFTDisplay_width",None))
     if TFTbr is None:
-        cbpi.add_config_parameter("TFTDisplay_width", 310, "number", "Choose TFTDisplay_width, CBPi reboot required")
+        cbpi.add_config_parameter("TFTDisplay_width", 310, "number", "Choose TFTDisplay_width, recommendation 310, NO! CBPi reboot required")
         TFTbr = str(cbpi.get_config_parameter("TFTDisplay_width",None))
         cbpi.app.logger.info("TFTbr: %s" % (TFTbr))
     return ("-h %s" % TFTbr)
@@ -174,8 +176,6 @@ def initTFT(app):
         ## YOUR CODE GOES HERE    
         ## This is the main job
         updateRRDdatabase()
-        cbpi.app.logger.info("TFTh: %s" % (TFTh()))
-        cbpi.app.logger.info("TFTw: %s" % (TFTw()))
         graphAsFile()
         thread.start_new_thread(TFT240x320,())
 #End of init
