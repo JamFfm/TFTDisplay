@@ -1,8 +1,8 @@
 # TFTDisplay (BETA)
->CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
+CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
 
->With this add-on you can display something on a 240 x 320 TFT SPI Display.
->It is based on the ILI9341 controller.
+With this add-on you can display something on a 240 x 320 TFT SPI Display.
+It is based on the ILI9341 controller.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
@@ -17,7 +17,7 @@
 
 (2)-- I followed this page how to install and run it:
 >https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
->Please do not update your Firmware. I will distroy thr Raspi configuration (not the hardware).
+>Please do not update your Firmware. It will distroy the Raspi configuration (not the hardware).
 >I noticed that you need first initialise with DC 18 and RST 23. This causes a white screen. After that change to DC 24 and RST 25. The latter is the GPIO I connected.
 
 >The modul can display a temperatur graph by the help of rrdtool.
@@ -45,12 +45,12 @@
 >(6)-- cd Adafruit_Python_ILI9341
 >
 >(7)-- sudo python setup.py install
->
->        
->Install rrdtool for python:
->
->## You can install it with the Raspi software installer:
->
+
+        
+## Install rrdtool for python:
+
+#You can install it with the Raspi software installer:
+
 >(1)-- Goto options/Einstellungen
 >
 >(2)-- Add / Remove Software
@@ -62,15 +62,15 @@
 >(5)-- hit apply
 >
 >rrdtool should be installed.
->
+
 ## You have to clone the Addon (as long as ist is not offical)
 
-git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
+>git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
 # Usage
 
-Shows the temp sensor of the Kettle (ID) in TFT_Display_Kettle_ID in parameters.
+>Shows the temp sensor of the Kettle (ID) in TFT_Display_Kettle_ID in parameters.
 
 # Known Problems
 
-TFT_Display_hight and TFT_Display_with in parameters is currently not used 
+>TFT_Display_hight and TFT_Display_with in parameters is currently not used 
