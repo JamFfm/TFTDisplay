@@ -6,16 +6,16 @@ It is based on the ILI9341 controller.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
-(1)--I followed this for wiring
-http://blog.riyas.org/2014/07/
+# I followed this for wiring
 
-BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
+>http://blog.riyas.org/2014/07/
+>BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
+>*I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
 
-I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
+![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
-![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "TFTDisplax 320x240")
+# I followed this page how to install and run it:
 
-(2)-- I followed this page how to install and run it:
 >https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
 >Please do not update your Firmware. It will distroy the Raspi configuration (not the hardware).
 >I noticed that you need first initialise with DC 18 and RST 23. This causes a white screen. After that change to DC 24 and RST 25. The latter is the GPIO I connected.
