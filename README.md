@@ -10,6 +10,7 @@ It is based on the ILI9341 controller.
 
 >http://blog.riyas.org/2014/07/
 >BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
+>
 >*I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
