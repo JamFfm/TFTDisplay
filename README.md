@@ -11,9 +11,7 @@ It is based on the ILI9341 controller.
 >BUT I DID NOT USE THE COMMANDS ON THIS PAGE!
 >I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
 
-(/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/gpio_connectio_to_tft_il9341.png)
-
-![](https://github.com/JamFfm/TFTDisplay/blob/master/TFTDisplay/50%20Ohm%20at%20lsd%20pin.png "TFTDisplax 320x240")
+![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "TFTDisplax 320x240")
 
 (2)-- I followed this page how to install and run it:
 >https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
