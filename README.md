@@ -1,4 +1,4 @@
-# TFTDisplay (BETA)
+# TFTDisplay
 CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 240 x 320 with ILI9341 driver
 
 With this add-on you can display a Temperature Graph of a Kettle (its sensor) on a 240 x 320 TFT SPI Display.
@@ -73,11 +73,10 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 # Usage
 
 >Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters.
->You can change with and hight
+>You can change with, hight and fontsize. I recomment 290/310 14 or 380/400 16.
 >Changing these parameters do not need a reboot and are taken at once.
 >To change a temp sensor you can add it to the kettle in CBPI3 or you change the Kettle ID
 
 # Known Problems
 
->mybe too much logging infos
 >only for brewing-kettles not for fermentation until now
