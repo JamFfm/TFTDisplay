@@ -112,7 +112,7 @@ def graphAsFile():
     rrdtool.graph (path,
     "--imgformat", "PNG",
         "--start", "-40m",
-        "--font", "DEFAULT:14",        
+        "--font", "DEFAULT:%s" % str((TFTfontsize)),        
         "--grid-dash", "0:10",
         "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
         #"-w 290", "-h 310",                   
@@ -146,7 +146,7 @@ def Temp(kkid):
 def set_TFTh():  
     TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
     if TFThoehe is None:
-        cbpi.add_config_parameter("TFT_Hight", 310, "number", "Choose TFTDisplay hight, default 290, NO! CBPi reboot required")
+        cbpi.add_config_parameter("TFT_Hight", 310, "number", "Choose TFTDisplay hight, default 310/400, NO! CBPi reboot required")
         TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
         cbpi.app.logger.info("TFTDisplay  - TFThoehe added: %s" % (TFThoehe))
     #cbpi.app.logger.info("TFTDisplay  - TFThoehe read Database: %s" % (TFThoehe))
@@ -156,7 +156,7 @@ def set_TFTh():
 def set_TFTw():  
     TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
     if TFTbr is None:
-        cbpi.add_config_parameter("TFT_Width", 290, "number", "Choose TFTDisplay width, default 310, NO! CBPi reboot required")
+        cbpi.add_config_parameter("TFT_Width", 290, "number", "Choose TFTDisplay width, default 290/380, NO! CBPi reboot required")
         TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
         cbpi.app.logger.info("TFTDisplay  - TFTbr added: %s" % (TFTbr))
     #cbpi.app.logger.info("TFTDisplay  - TFTbr read Database: %s" % (TFTbr))
@@ -170,6 +170,13 @@ def set_parameter_id3():
         cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
     return TFTid3
 
+def set_fontsize():
+    fosi = cbpi.get_config_parameter("TFT_Fontsize", None)
+    if fosi is None:
+        fosi = 14
+        cbpi.add_config_parameter ("TFT_Fontsize", 14, "number", "Choose fontsize of grid default is 14, NO! CBPi reboot required")
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
+    return fosi
 
 @cbpi.initalizer(order=3100)
 def initTFT(app):
@@ -177,9 +184,10 @@ def initTFT(app):
 
     rrdDateiVorhanden()
     try:
-        cbpi.app.logger.info("TFTDisplayB  - TFTKetteID: %s" % (set_parameter_id3()))
-        cbpi.app.logger.info("TFTDisplayB  - TFThight: %s" % (set_TFTh()))
-        cbpi.app.logger.info("TFTDisplayB  - TFTwith: %s" % (set_TFTw()))
+        cbpi.app.logger.info("TFTDisplay  - TFTKetteID:     %s" % (set_parameter_id3()))
+        cbpi.app.logger.info("TFTDisplay  - TFThight:       %s" % (set_TFTh()))
+        cbpi.app.logger.info("TFTDisplay  - TFTwith:        %s" % (set_TFTw()))
+        cbpi.app.logger.info("TFTDisplay  - TFTfontsize:    %s" % (set_fontsize()))
     except:
         pass
     
@@ -196,7 +204,10 @@ def initTFT(app):
 
         global TFTwith
         TFTwith = set_TFTw()
-        #cbpi.app.logger.info("TFTDisplay  - TFTwith: %s" % (TFTwith))
+
+        global TFTfontsize
+        TFTfontsize = set_fontsize()
+
 
         updateRRDdatabase(id3)
         
