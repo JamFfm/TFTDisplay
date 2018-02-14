@@ -1,12 +1,12 @@
 # TFTDisplay (BETA)
-CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 320x240 with ILI9341 driver
+CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 240 x 320 with ILI9341 driver
 
-With this add-on you can display something on a 240 x 320 TFT SPI Display.
+With this add-on you can display a Temperature Graph of a Kettle (its sensor) on a 240 x 320 TFT SPI Display.
 It is based on the ILI9341 controller.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
-# I followed this for wiring
+# I followed this only for wiring
 
 >http://blog.riyas.org/2014/07/
 >
@@ -16,22 +16,24 @@ It is based on the ILI9341 controller.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
-# I followed this page how to install and run it:
+# I followed this page how to install and run the modules:
 
 >https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
->Please do not update your Firmware. It will distroy the Raspi configuration (not the hardware).
->I noticed that you need first initialise with DC 18 and RST 23. This causes a white screen. After that change to DC 24 and RST 25. The latter is the GPIO I connected.
+>Please do not update your firmware. It will distroy the Raspi configuration (hopefully not the hardware).
+>I noticed that you need first initialise with DC 18 and RST 23. This causes a white / or false-colour screen. After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
+>
 >The modul can display a temperatur graph by the help of rrdtool.
 
 # Installation
 >is a bit tricky:
 >You have to install the Adafruit_Pyton_ILI9341 and some other packages.
-<Most of them are already installed but they all have to be present.
->At the end the rrdtool has to be installed with the Raspi software-installer.
+>Most of them are already installed but they all have to be present.
+>After that the rrdtool has to be installed with the Raspi software-installer.
 >In the end you have to install the addon.
 >Dont forget the reboot.
 
 ## Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
+Copy and paste all lines with (1) to (7) one after the other into the Raspi-commandline and hit enter to install.
 
 >(1)-- cd craftbeerpi3
 >
@@ -52,7 +54,7 @@ It is based on the ILI9341 controller.
 
 #You can install it with the Raspi software installer:
 
->(1)-- Goto options/Einstellungen
+>(1)-- Goto options      in German Einstellungen
 >
 >(2)-- Add / Remove Software
 >
@@ -64,14 +66,17 @@ It is based on the ILI9341 controller.
 >
 >rrdtool should be installed.
 
-## You have to clone the Addon (as long as ist is not offical)
+## You have to clone the Addon (as long as it is not offical)
 
 >git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
 # Usage
 
->Shows the temp sensor of the Kettle (ID) in TFT_Display_Kettle_ID in parameters.
+>Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters.
+>You can change with and hight
+>Changing these parameters do not need a reboot and are taken at once.
+>To change a temp sensor you can add it to the kettle in CBPI3 or you change the Kettle ID
 
 # Known Problems
 
->The Kettle parameter does not work at this time only for kettle ID 1
+>mybe too much logging infos
