@@ -80,4 +80,4 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 # Known Problems
 
 >mybe too much logging infos
->not for use in fermentationmode until now
+>only for brewing-kettles not for fermentation until now
