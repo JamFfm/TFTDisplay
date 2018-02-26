@@ -66,7 +66,7 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 >
 >rrdtool should be installed.
 
-## You have to clone the Addon (as long as it is not offical)
+## You have to clone the CBPI3 Addon (as long as it is not offical)
 
 >git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
@@ -80,3 +80,5 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 # Known Problems
 
 >only for brewing-kettles not for fermentation until now
+>there is an error after a while when painting the graph witch stops CBPI3: Error: too many open files
+
