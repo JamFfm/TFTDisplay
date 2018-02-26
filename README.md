@@ -79,6 +79,5 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 
 # Known Problems
 
->only for brewing-kettles not for fermentation until now
->there is an error after a while when painting the graph witch stops CBPI3: Error: too many open files
+>only for brewing-kettles not for fermentation until now. There is an error after a while (ca. 2h) when painting the graph witch stops CBPI3: Error: too many open files. Also the responce to clicks in the gui become delayed a bit. Could not fix it. Help is welcome.
 
