@@ -12,7 +12,7 @@ It is based on the ILI9341 controller.
 >
 >BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
 >
->*I put a 48 Ohm resistor inbetween LCD-Pin of TFT and the Raspi Pin.
+>*I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
 
 ![](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
@@ -79,5 +79,5 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 
 # Known Problems
 
->only for brewing-kettles not for fermentation until now. There is an error after a while (ca. 2h) when painting the graph witch stops CBPI3: Error: too many open files. Also the responce to clicks in the gui become delayed a bit. Could not fix it. Help is welcome.
+>only for brewing-kettles not for fermentation until now. The responce to clicks in the gui become delayed a bit. Could not fix it until now. Help is welcome.
 
