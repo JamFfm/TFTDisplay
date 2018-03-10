@@ -20,23 +20,30 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-# Version 1.0.0.0
+# Version 1.1.0.0
+# Assembled by JamFfm
 
 from modules import cbpi, app
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from pathlib import Path
 import os, re, thread, time
 import Adafruit_ILI9341 as TFT
 import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import rrdtool
-from pathlib import Path
+
 
 
 
 global used
 used = 0
+global Keepstandby
+Keepstandby = 0
+global disp
+disp = None
+
 def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
     # Get rendered font width and height.
     draw = ImageDraw.Draw(image)
@@ -51,9 +58,7 @@ def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
     # Paste the text into the image, using it as a mask for transparency.
     image.paste(rotated, position, rotated)
 
-def TFT240x320():
-    ## YOUR CODE GOES HERE    
-    ## This is the main job
+def TFT240x320(imagefile):
     global used
     if used == 0:
         DC = 18
@@ -62,24 +67,36 @@ def TFT240x320():
     else:
         DC = 24
         RST = 25
+        used = used + 1
 
     SPI_PORT = 0
     SPI_DEVICE = 0
 
+    #create spi connection
+    spidevice=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
     # Create TFT LCD display class
-    disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))    
+    disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
+    #disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))    
 
-    # Initialize display.
-    disp.begin()
+    # Initialize display only twice
+    global used
+    if used == 1:
+        disp.begin()
+        
+    elif used == 2:
+        disp.begin()
+    else:
+        pass
+        cbpi.app.logger.info('TFTDisplay  - no beginn display %s' % (used))
 
     # Load default font.
     #font = ImageFont.load_default()
         
     # Load an image
-    imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
+    #imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
     image = Image.open(imagefile)
     #cbpi.app.logger.info('Loading image %s' % (imagefile))
-
+    
     # Resize the image and rotate it so it's 240x320 pixels.
     image = image.rotate(90).resize((240, 320))
     #cbpi.app.logger.info('image rotate')
@@ -91,6 +108,8 @@ def TFT240x320():
     # Draw the image on the display hardware.
     disp.display(image)
     #cbpi.app.logger.info('TFTDisplay  - image display')
+    spidevice.close()
+    
 
 def createRRDdatabase():
     rrdtool.create(
@@ -167,7 +186,7 @@ def set_parameter_id3():
     if TFTid3 is None:
         TFTid3 = 1
         cbpi.add_config_parameter ("TFT_Kettle_ID", 1, "number", "Choose kettle (Number), NO! CBPi reboot required")      
-        cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
+        #cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
     return TFTid3
 
 def set_fontsize():
@@ -175,12 +194,19 @@ def set_fontsize():
     if fosi is None:
         fosi = 14
         cbpi.add_config_parameter ("TFT_Fontsize", 14, "number", "Choose fontsize of grid default is 14, NO! CBPi reboot required")
-        cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
+        #cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
     return fosi
 
+def set_StartscreenOn():
+    startsc = cbpi.get_config_parameter("TFT_StartscreenOn", None)
+    if startsc is None:
+        startsc = "on"
+        cbpi.add_config_parameter ("TFT_StartscreenOn", "on", "select", "skip the CBPI Logo and start chart at power on, NO! CBPi reboot required", ["on", "off"])
+        cbpi.app.logger.info("TFTDisplay  - TFT_StartscreenOn: %s" % (startsc))
+    return startsc
+
 @cbpi.initalizer(order=3100)
-def initTFT(app):
-    ##Background Task to load the data    
+def initTFT(app):       
 
     rrdDateiVorhanden()
     try:
@@ -191,11 +217,13 @@ def initTFT(app):
     except:
         pass
     
+#end of init    
     
     @cbpi.backgroundtask(key="TFT240x320job", interval=5)
     def TFT240x320job(api):
         ## YOUR CODE GOES HERE    
         ## This is the main job
+        
         global id3
         id3 = set_parameter_id3()
 
@@ -208,10 +236,38 @@ def initTFT(app):
         global TFTfontsize
         TFTfontsize = set_fontsize()
 
+        global StartscreenOn
+        StartscreenOn = set_StartscreenOn()
 
-        updateRRDdatabase(id3)
+        s = cbpi.cache.get("active_step")
         
-        graphAsFile()
-        
-        thread.start_new_thread(TFT240x320,())
-#End of init
+        if s is not None or StartscreenOn == "off":
+            #Brewing Starts and so Chart starts or startscreen is off
+            
+            updateRRDdatabase(id3)
+            
+            graphAsFile()
+
+            imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
+
+            TFT240x320(imagefile)
+            #thread.start_new_thread(TFT240x320,(imagefile,))
+
+            global Keepstandby
+            Keepstandby = 0
+            
+        else:
+            #Standby screen
+
+            global Keepstandby
+            
+            if Keepstandby < 2:
+                StandbyPath = "/home/pi/craftbeerpi3/modules/ui/static/logo.png"
+                TFT240x320(StandbyPath)
+                #thread.start_new_thread(TFT240x320,(imagefile))
+                global Keepstandby
+                Keepstandby = Keepstandby + 1
+            else:
+                #just keep the image on the scrreen without redraw
+                pass
+
