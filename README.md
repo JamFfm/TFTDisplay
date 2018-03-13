@@ -90,3 +90,7 @@ only for brewing-kettles not for fermentation until now. The responce to clicks 
 
 Fixed problem with too many files.
 
+# Support
+
+Report issues ether in the Git section or at Facebook in the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
+
