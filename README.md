@@ -6,13 +6,13 @@ It is based on the ILI9341 controller.
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
-## I followed this only for wiring
+## I followed this **only** for wiring
 
 http://blog.riyas.org/2014/07/
 
-BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
-
-*I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
+>BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
+>
+>*I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
 
 ![Wiring](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
@@ -24,7 +24,8 @@ I noticed that you need first initialise with DC 18 and RST 23. This causes a wh
 
 The modul can display a temperatur graph by the help of rrdtool.
 
-## Installation
+# Installation
+
 is a bit tricky:
 You have to install the Adafruit_Pyton_ILI9341 and some other packages.
 Most of them are already installed but they all have to be present.
@@ -32,7 +33,7 @@ After that the rrdtool has to be installed with the Raspi software-installer.
 In the end you have to install the addon.
 Dont forget the reboot.
 
-# Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
+## 1. Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
 Copy and paste all lines with (1) to (7) one after the other into the Raspi-commandline and hit enter to install.
 
 (1)-- cd craftbeerpi3
@@ -50,7 +51,7 @@ Copy and paste all lines with (1) to (7) one after the other into the Raspi-comm
 (7)-- sudo python setup.py install
 
         
-## Install rrdtool for python:
+## 2. Install rrdtool for python:
 
 You can install it with the Raspi software installer:
 
@@ -66,7 +67,7 @@ You can install it with the Raspi software installer:
 
 rrdtool should be installed.
 
-## You have to clone the CBPI3 Addon (as long as it is not offical)
+## 3. You have to clone the CBPI3 Addon (as long as it is not offical)
 
 -git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
@@ -76,12 +77,16 @@ or when official
 
 # Usage
 
-Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters.
-You can change with, hight and fontsize. I recomment 290/310 14 or 380/400 16.
-Changing these parameters do not need a reboot and are taken at once.
+Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters as a graph over 1h and 40 min.
+You can change with, hight and fontsize. I recomment 290/310, 14 or 380/400, 16.
+Changing these parameters do not need a reboot and are used at once.
 To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID.
 
 # Known Problems
 
-only for brewing-kettles not for fermentation until now. The responce to clicks in the gui may become a bit delayed .Could not fix it until now. Help is welcome.
+only for brewing-kettles not for fermentation until now. The responce to clicks in the gui may become a bit delayed. Could not fix it until now. Help is welcome.
+
+# Fixed Problems
+
+Fixed problem with too many files.
 
