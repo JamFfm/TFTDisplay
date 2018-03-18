@@ -20,9 +20,9 @@ http://blog.riyas.org/2014/07/
 
 https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
 Please do not update your firmware. It will distroy the Raspi configuration (hopefully not the hardware).
-I noticed that you need first initialise with DC 18 and RST 23. This causes a white / or false-colour screen. After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
+I noticed that you need first initialise with DC 18 and RST 25 (with 23 there will be a false-color image for a short period). This causes a white (or false-color screen). After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
 
-The modul can display a temperatur graph by the help of rrdtool.
+The modul can display a temperatur graph of the past 40 min by the help of rrdtool.
 
 # Installation
 
@@ -78,13 +78,13 @@ or when official
 # Usage
 
 Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters as a graph over 1h and 40 min.
-You can change with, hight and fontsize. I recomment 290/310, 14 or 380/400, 16.
+You can change width, hight and fontsize. I recomment 384, 400, 16.
 Changing these parameters do not need a reboot and are used at once.
-To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID.
+To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID in parameters.
 
 # Known Problems
 
-only for brewing-kettles not for fermentation until now. The responce to clicks in the gui may become a bit delayed. Could not fix it until now. Help is welcome.
+only for brewing-kettles not for fermentation until now. The responce to clicks in the gui may become a little bit delayed. Could not fix it until now. Help is welcome.
 
 # Fixed Problems
 
@@ -92,5 +92,5 @@ Fixed problem with too many files.
 
 # Support
 
-Report issues ether in the Git section or at Facebook in the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
+Report issues either in this Git section or at Facebook in the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
 
