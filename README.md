@@ -75,11 +75,11 @@ rrdtool should be installed.
 
 ## 3. You have to clone the CBPI3 Addon (as long as it is not offical)
 
-- git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
+(1)-- git clone https://github.com/JamFfm/TFTDisplay.git -b master --single-branch /home/pi/craftbeerpi3/modules/plugins
 
-or when official
+**or** when official
 
-- just install from the add-on screen in Craftbeerpi3
+(1)-- just install from the add-on screen in Craftbeerpi3
 
 # Usage
 
