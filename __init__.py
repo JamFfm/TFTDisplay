@@ -24,6 +24,8 @@
 # Assembled by JamFfm
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
 # 16.03.2018 added alternative autocale of graph, show XX.x numbers on Y-axis
+# 18.03.2018 optimized code in function updateRRDdatabase(kid) (2 times path)
+# 18.03.2018 add parameter TFT_Duration in parameters so you can choose which period to show
 
 from modules import cbpi, app
 from PIL import Image
@@ -98,16 +100,18 @@ def createRRDdatabase():
     cbpi.app.logger.info('TFTDisplay  - createRRDdatabase')
 
 def updateRRDdatabase(kid):
+    #kid is the TFT_Kettle_ID from parameters
     pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd")
-    #cbpi.app.logger.info("TFTDisplay  - %s" % (pfad))
-    rrdtool.update("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd", "N:%s" % (Temp(kid)));
+    
+    rrdtool.update(pfad, "N:%s" % (Temp(kid)));
     #cbpi.app.logger.info('TFTDisplay  - rrd update')
     
 def graphAsFile():
     path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png"
     rrdtool.graph (path,
     "--imgformat", "PNG",
-        "--start", "-40m",
+        #"--start", "-40m",
+        "--start", "%s" % str((TFTduration)),
         "--font", "DEFAULT:%s" % str((TFTfontsize)),
         "--title", "CraftBeerPi 3.0.2      °C",
         "--grid-dash", "0:10",
@@ -119,7 +123,7 @@ def graphAsFile():
         #"--alt-y-grid",
         #"--color", "CANVAS#000000",
         "--left-axis-format", "%.1lf",
-        "--alt-autoscale",
+        "--alt-autoscale", #command this one to change the x-axis scale behavior
         "--no-legend",
         "--slope-mode", #smoother line
         "--use-nan-for-all-missing-data",
@@ -151,9 +155,7 @@ def set_TFTh():
         cbpi.add_config_parameter("TFT_Hight", 400, "number", "Choose TFTDisplay hight [pixel], default 400, NO! CBPi reboot required")
         TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
         cbpi.app.logger.info("TFTDisplay  - TFThoehe added: %s" % (TFThoehe))
-    #cbpi.app.logger.info("TFTDisplay  - TFThoehe read Database: %s" % (TFThoehe))
     return TFThoehe
-
 
 def set_TFTw():  
     TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
@@ -161,7 +163,6 @@ def set_TFTw():
         cbpi.add_config_parameter("TFT_Width", 384, "number", "Choose TFTDisplay width [pixel], default 384, NO! CBPi reboot required")
         TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
         cbpi.app.logger.info("TFTDisplay  - TFTbr added: %s" % (TFTbr))
-    #cbpi.app.logger.info("TFTDisplay  - TFTbr read Database: %s" % (TFTbr))
     return TFTbr
 
 def set_parameter_id3():  
@@ -169,15 +170,15 @@ def set_parameter_id3():
     if TFTid3 is None:
         TFTid3 = 1
         cbpi.add_config_parameter ("TFT_Kettle_ID", 1, "number", "Choose kettle (Number), NO! CBPi reboot required")      
-        #cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
+        cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
     return TFTid3
 
 def set_fontsize():
     fosi = cbpi.get_config_parameter("TFT_Fontsize", None)
     if fosi is None:
-        fosi = 14
+        fosi = 16
         cbpi.add_config_parameter ("TFT_Fontsize", 16, "number", "Choose fontsize of grid default is 16, NO! CBPi reboot required")
-        #cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
     return fosi
 
 def set_StartscreenOn():
@@ -185,8 +186,19 @@ def set_StartscreenOn():
     if startsc is None:
         startsc = "on"
         cbpi.add_config_parameter ("TFT_StartscreenOn", "on", "select", "skip the CBPI Logo and start chart at power on, NO! CBPi reboot required", ["on", "off"])
-        cbpi.app.logger.info("TFTDisplay  - TFT_StartscreenOn: %s" % (startsc))
+        cbpi.app.logger.info("TFTDisplay  - TFT_StartscreenOn added: %s" % (startsc))
     return startsc
+
+def set_duration():
+    dur = cbpi.get_config_parameter("TFT_Duration", None)
+    if dur is None:
+        dur = "40m"
+        cbpi.add_config_parameter ("TFT_Duration", "40m", "string", "Choose time elapsed to be displayed, default is 40m (40 minutes), have a look at readme, NO! CBPi reboot required")     
+        
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (dur))
+    dur = ("-%s" % (dur))
+    cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize: %s" % (dur))
+    return dur
 
 @cbpi.initalizer(order=3100)
 def initTFT(app):       
@@ -197,6 +209,7 @@ def initTFT(app):
         cbpi.app.logger.info("TFTDisplay  - TFThight:       %s" % (set_TFTh()))
         cbpi.app.logger.info("TFTDisplay  - TFTwith:        %s" % (set_TFTw()))
         cbpi.app.logger.info("TFTDisplay  - TFTfontsize:    %s" % (set_fontsize()))
+        cbpi.app.logger.info("TFTDisplay  - TFTduration:    %s" % (set_duration()))
     except:
         pass
     
@@ -221,6 +234,9 @@ def initTFT(app):
 
         global StartscreenOn
         StartscreenOn = set_StartscreenOn()
+
+        global TFTduration
+        TFTduration = set_duration()
 
         s = cbpi.cache.get("active_step")
         
