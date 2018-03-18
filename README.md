@@ -12,7 +12,7 @@ http://blog.riyas.org/2014/07/
 
 >BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
 >
->*I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
+>*I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin. update: for me it also worked without the resistor, but I recommend to use one
 
 ![Wiring](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
@@ -87,7 +87,7 @@ To change a temp sensor you can add it to the kettle in CBPI3 and/or you change 
 
 There are several parameter to change the display behavior
 
--TFT_Duaration: defines the amount of time to look back and drawn at the graph. It ist allowed to use units like m=minutes, d=days, w=weeks, M=months. However the x-axis is not shown properly in every cases. The following values do funktion well: 10m, 20m, 40m, 80m, 100m, 200m, 300m, 400m, 1M, 2M, 4M.
+-TFT_Duaration: defines the amount of time to draw as graph. It is allowed to use units like m=minutes, d=days, w=weeks, M=months. However the x-axis is not shown properly in every cases. The following values do funktion well: 10m, 20m, 40m, 80m, 100m, 200m, 300m, 400m, 1M, 2M, 4M.
 
 > do not input values below 6m!
 
@@ -99,16 +99,17 @@ Default is 16
 -TFT_Hight: Hight of the image displayed in pixel.
 Default is 400
 
--TFT_Kettle_ID: The id of the kettle whose tempsensor is shown in the graph. The id is in the sequence the kettles are listed beginning with 1
+-TFT_Kettle_ID: The id of the kettle whose tempsensor is shown in the graph. The kettle id is in the sequence the kettles are listed in "Hardware Settings" beginning with 1
 
 -TFT_StartscreenOn: whether the CraftBerrPi Logo is shown at the beginning and graph begins at start Steps ("on"), or showing graph at start ("off")
 
 -TFT_Width: width of the image displayed in pixel.
-Default is 384. This shows the x-axis, if you use 380 it is not shown.
+Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 # Known Problems
 
 only for brewing-kettles not for fermentation until now. The responce to clicks in the gui may become a little bit delayed. Could not fix it until now. Help is welcome.
+X-axis is not shown properly at some TFT_Duration values
 
 # Fixed Problems
 
