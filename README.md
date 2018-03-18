@@ -28,6 +28,7 @@ The modul can display a temperatur graph of the past 40 min by the help of rrdto
 
 is a bit tricky:
 You have to install the Adafruit_Pyton_ILI9341 and some other packages.
+
 Most of them are already installed but they all have to be present.
 After that the rrdtool has to be installed with the Raspi software-installer.
 In the end you have to install the addon.
@@ -77,10 +78,33 @@ or when official
 
 # Usage
 
-Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters as a graph over 1h and 40 min.
+Shows the temp sensor of the Kettle (ID) in TFT_Kettle_ID in parameters as a graph over 40 min (adjustible).
 You can change width, hight and fontsize. I recomment 384, 400, 16.
 Changing these parameters do not need a reboot and are used at once.
 To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID in parameters.
+
+## Parameter
+
+There are several parameter to change the display behavior
+
+-TFT_Duaration: defines the amount of time to look back and drawn at the graph. It ist allowed to use units like m=minutes, d=days, w=weeks, M=months. However the x-axis is not shown properly in every cases. The following values do funktion well: 10m, 20m, 40m, 80m, 100m, 200m, 300m, 400m, 1M, 2M, 4M.
+
+> do not input values below 6m!
+
+Default is 40m
+
+-TFT_Fontsize: choose a fontsize, like 12, 14, 16, 18.
+Default is 16
+
+-TFT_Hight: Hight of the image displayed in pixel.
+Default is 400
+
+-TFT_Kettle_ID: The id of the kettle whose tempsensor is shown in the graph. The id is in the sequence the kettles are listed beginning with 1
+
+-TFT_StartscreenOn: whether the CraftBerrPi Logo is shown at the beginning and graph begins at start Steps ("on"), or showing graph at start ("off")
+
+-TFT_Width: width of the image displayed in pixel.
+Default is 384. This shows the x-axis, if you use 380 it is not shown.
 
 # Known Problems
 
