@@ -13,8 +13,9 @@ The modul can display a temperatur graph by the help of rrdtool.
 http://blog.riyas.org/2014/07/
 
 >BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
->
-> *I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin. 
+
+> *I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
+
 > update: for me it also worked without the resistor, but I recommend to use one
 
 ![Wiring](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
