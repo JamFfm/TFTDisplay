@@ -25,6 +25,8 @@ https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
 
 > Please do not update your firmware. It will distroy the Raspi configuration (hopefully not the hardware).
 
+> Have a look at the installation section of this readme. You only have to follow that one.
+
 I noticed that you need first initialise with DC 18 and RST 25 (with 23 there will be a false-color image for a short period). This causes a white (or false-color screen). After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
 
 # Installation
@@ -38,7 +40,7 @@ In the end you have to install the addon.
 Dont forget the reboot.
 
 ## 1. Install Adafruit_Pyton_ILI9341 for TFTDisplay_240x320:
-Copy and paste all lines with (1) to (7) one after the other into the Raspi-commandline and hit enter to install.
+Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandline and hit enter to install.
 
 (1)-- cd craftbeerpi3
 
