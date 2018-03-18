@@ -20,8 +20,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-# Version 1.1.0.0
+# Version 1.2.1.2
 # Assembled by JamFfm
+# 14.03.2018 changed DC and RST for init display, change default font size, add title
+# 16.03.2018 added alternative autocale of graph, show XX.x numbers on Y-axis
 
 from modules import cbpi, app
 from PIL import Image
@@ -34,66 +36,46 @@ import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import rrdtool
 
-
-
-
 global used
 used = 0
 global Keepstandby
 Keepstandby = 0
-global disp
-disp = None
-
-def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
-    # Get rendered font width and height.
-    draw = ImageDraw.Draw(image)
-    width, height = draw.textsize(text, font=font)
-    # Create a new image with transparent background to store the text.
-    textimage = Image.new('RGBA', (width, height), (0,0,0,0))
-    # Render the text.
-    textdraw = ImageDraw.Draw(textimage)
-    textdraw.text((0,0), text, font=font, fill=fill)
-    # Rotate the text image.
-    rotated = textimage.rotate(angle, expand=1)
-    # Paste the text into the image, using it as a mask for transparency.
-    image.paste(rotated, position, rotated)
 
 def TFT240x320(imagefile):
     global used
+    global DC
+    global RST
+    
     if used == 0:
         DC = 18
-        RST = 23
+        RST = 25
         used = 1
-    else:
+
+    elif used == 1:
         DC = 24
         RST = 25
-        used = used + 1
+        used = 2
+
+    else:
+        used = 3
 
     SPI_PORT = 0
     SPI_DEVICE = 0
 
     #create spi connection
-    spidevice=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
+    spidevice = SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
     # Create TFT LCD display class
     disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
-    #disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))    
-
+    
     # Initialize display only twice
     global used
-    if used == 1:
-        disp.begin()
-        
-    elif used == 2:
-        disp.begin()
+    if used < 3:
+        disp.begin()        
     else:
         pass
-        cbpi.app.logger.info('TFTDisplay  - no beginn display %s' % (used))
-
-    # Load default font.
-    #font = ImageFont.load_default()
+        cbpi.app.logger.info('TFTDisplay  - no disp init, use = %s' % (used))
         
     # Load an image
-    #imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
     image = Image.open(imagefile)
     #cbpi.app.logger.info('Loading image %s' % (imagefile))
     
@@ -101,15 +83,10 @@ def TFT240x320(imagefile):
     image = image.rotate(90).resize((240, 320))
     #cbpi.app.logger.info('image rotate')
 
-    # Write two lines of white text on the buffer, rotated 90 degrees counter clockwise.
-    #draw_rotated_text(image, 'Craftbeerpi 3.0.2', (150, 120), 90, font, fill=(255,255,255))
-    #cbpi.app.logger.info('TFTDisplay  - write text')
-
     # Draw the image on the display hardware.
     disp.display(image)
     #cbpi.app.logger.info('TFTDisplay  - image display')
     spidevice.close()
-    
 
 def createRRDdatabase():
     rrdtool.create(
@@ -131,13 +108,19 @@ def graphAsFile():
     rrdtool.graph (path,
     "--imgformat", "PNG",
         "--start", "-40m",
-        "--font", "DEFAULT:%s" % str((TFTfontsize)),        
+        "--font", "DEFAULT:%s" % str((TFTfontsize)),
+        "--title", "CraftBeerPi 3.0.2      °C",
         "--grid-dash", "0:10",
         "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
         #"-w 290", "-h 310",                   
         #"--full-size-mode",
-        "--no-gridfit",
-        #"--vertical-label", " Degree Celsius",
+        #"--no-gridfit",
+        #"--vertical-label", "Degree Celsius °C",
+        #"--alt-y-grid",
+        #"--color", "CANVAS#000000",
+        "--left-axis-format", "%.1lf",
+        "--alt-autoscale",
+        "--no-legend",
         "--slope-mode", #smoother line
         "--use-nan-for-all-missing-data",
         "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd:sensor1:AVERAGE",
@@ -165,7 +148,7 @@ def Temp(kkid):
 def set_TFTh():  
     TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
     if TFThoehe is None:
-        cbpi.add_config_parameter("TFT_Hight", 310, "number", "Choose TFTDisplay hight, default 310/400, NO! CBPi reboot required")
+        cbpi.add_config_parameter("TFT_Hight", 400, "number", "Choose TFTDisplay hight [pixel], default 400, NO! CBPi reboot required")
         TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
         cbpi.app.logger.info("TFTDisplay  - TFThoehe added: %s" % (TFThoehe))
     #cbpi.app.logger.info("TFTDisplay  - TFThoehe read Database: %s" % (TFThoehe))
@@ -175,7 +158,7 @@ def set_TFTh():
 def set_TFTw():  
     TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
     if TFTbr is None:
-        cbpi.add_config_parameter("TFT_Width", 290, "number", "Choose TFTDisplay width, default 290/380, NO! CBPi reboot required")
+        cbpi.add_config_parameter("TFT_Width", 384, "number", "Choose TFTDisplay width [pixel], default 384, NO! CBPi reboot required")
         TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
         cbpi.app.logger.info("TFTDisplay  - TFTbr added: %s" % (TFTbr))
     #cbpi.app.logger.info("TFTDisplay  - TFTbr read Database: %s" % (TFTbr))
@@ -193,7 +176,7 @@ def set_fontsize():
     fosi = cbpi.get_config_parameter("TFT_Fontsize", None)
     if fosi is None:
         fosi = 14
-        cbpi.add_config_parameter ("TFT_Fontsize", 14, "number", "Choose fontsize of grid default is 14, NO! CBPi reboot required")
+        cbpi.add_config_parameter ("TFT_Fontsize", 16, "number", "Choose fontsize of grid default is 16, NO! CBPi reboot required")
         #cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
     return fosi
 
