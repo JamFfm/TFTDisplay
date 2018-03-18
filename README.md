@@ -8,7 +8,7 @@ The modul can display a temperatur graph by the help of rrdtool.
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "TFTDisplax 320x240")
 
-## I followed this **only** for wiring
+## I followed this link **only** for wiring
 
 http://blog.riyas.org/2014/07/
 
