@@ -114,10 +114,11 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 # Known Problems
 
-- only for brewing-kettles not for fermentation until now. 
-- The responce to clicks in the gui may become a little bit delayed. Could not fix it until now. 
+- only for brewing-kettles not for fermentation until now 
+- The responce to clicks in the gui may become a little bit delayed
 - X-axis is not shown properly at some TFT_Duration values
 - I noticed that you need first initialise with DC 18 and RST 25 (with 23 there will be a false-color image for a short period). This causes a white (or false-color screen). After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
+- cant adjust the brightness and backlight
 
 **Help is welcome.**
 
