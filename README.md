@@ -87,7 +87,7 @@ rrdtool should be installed.
 Shows the temperature-sensor of the Kettle (ID) in TFT_Kettle_ID in parameters as a graph over 40 min (adjustible).
 You can change width, hight and fontsize. I recomment 384, 400, 16.
 Changing these parameters do not need a reboot and are used at once.
-To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID in parameters.
+To change a temp sensor you can add it to the kettle in CBPI3 and/or you change the Kettle ID in parameters. Once you start fermentation steps the fermentation graph is shown (red) with the coresponding target temperature (blue). If you only like to display a graph during Brewing steps or fermentaion steps then turn on the startscreen which will display the CraftbeerPi logo in standby mode
 
 ## Parameter
 
