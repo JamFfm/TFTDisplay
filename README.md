@@ -112,19 +112,25 @@ Default is 400
 - TFT_Width: width of the image displayed in pixel.
 Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
+- TFT_Duration: Amount of time the graph should show. I has effect on Berew- and Ferm Mode. Default is 40m but you can choose 1d or 1w if it makes sense.
+
+- TFT_Fermenter_ID: The id of the fermenter whose tempsensor is shown in the graph. The kettle id is in the sequence the fermenters are listed in "Hardware Settings" beginning with 1. Here also the Target Temp is shown.
+
 # Known Problems
 
-- only for brewing-kettles not for fermentation until now 
+
 - The responce to clicks in the gui may become a little bit delayed
 - X-axis is not shown properly at some TFT_Duration values
-- I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color screen). After that change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
+- I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color screen). After that, change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code.
 - cant adjust the brightness and backlight
+- ugly code style of a beginner :-)
 
 **Help is welcome.**
 
 # Fixed Problems
 
-Fixed problem with too many files.
+- fixed problem with too many files.
+- only for brewing-kettles not for fermentation until now 
 
 # Support
 
