@@ -93,11 +93,9 @@ To change a temp sensor you can add it to the kettle in CBPI3 and/or you change 
 
 There are several parameter to change the display behavior
 
-- TFT_Duaration: defines the amount of time to draw as graph. It is allowed to use units like m=minutes, d=days, w=weeks, M=months. However the x-axis is not shown properly in every cases. The following values do funktion well: 10m, 20m, 40m, 80m, 100m, 200m, 300m, 400m, 1M, 2M, 4M.
+- TFT_Duaration: defines the amount of time to draw as graph. It is allowed to use units like m=minutes, d=days, w=weeks, M=months. However the x-axis is not shown properly in every cases. The following values do funktion well: 10m, 20m, 40m, 80m, 100m, 200m, 300m, 400m, 1M, 2M, 4M. Default is 40m
 
 > do not input values below 6m!
-
-Default is 40m
 
 - TFT_Fontsize: choose a fontsize, like 12, 14, 16, 18.
 Default is 16
@@ -112,12 +110,9 @@ Default is 400
 - TFT_Width: width of the image displayed in pixel.
 Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
-- TFT_Duration: Amount of time the graph should show. I has effect on Berew- and Ferm Mode. Default is 40m but you can choose 1d or 1w if it makes sense.
-
 - TFT_Fermenter_ID: The id of the fermenter whose tempsensor is shown in the graph. The kettle id is in the sequence the fermenters are listed in "Hardware Settings" beginning with 1. Here also the Target Temp is shown.
 
 # Known Problems
-
 
 - The responce to clicks in the gui may become a little bit delayed
 - X-axis is not shown properly at some TFT_Duration values
