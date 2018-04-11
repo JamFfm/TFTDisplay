@@ -129,5 +129,5 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 # Support
 
-Report issues either in this Git section or at Facebook in the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
+Report issues either in this Git section or at Facebook at the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
 
