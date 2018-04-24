@@ -6,9 +6,9 @@ It is based on the ILI9341 controller.
 
 The modul can display a temperatur graph by the help of rrdtool.
 
-![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplax 320x240")
+![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplay 320x240")
 
-![Ferment](https://github.com/JamFfm/TFTDisplay/blob/master/ferment.JPG "FermTFTDisplax 320x240")
+![Ferment](https://github.com/JamFfm/TFTDisplay/blob/master/Ferment.JPG "FermTFTDisplay 320x240")
 
 ## I followed this link **only** for wiring
 
