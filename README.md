@@ -79,6 +79,7 @@ rrdtool should be installed.
 ## 3. You have to install the CBPI3 Addon (it is now official)
 
 (1)-- just install from the add-on screen in Craftbeerpi3
+
 (2)-- reboot the CBPi3 Software or the raspi
 
 # Usage
