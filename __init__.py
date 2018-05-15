@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
 # ILI9341 lib:
 # Copyright (c) 2014 Adafruit Industries
 # Author: Tony DiCola
@@ -34,7 +35,8 @@
 # 21.03.2018 duration is displayed at Title
 # 21.03.2018 change if loop to detect ferm mode, femTemp(femid), set fermentationOn(), etc added
 # 09.04.2018 Ferm or Brew modus displayed in Title, finished fermentation support
-# 11.04.2018 Added Target Temp in Ferm mode
+# 11.04.2018 Added Target Temp-Graph in Ferm mode
+# 04.05.2018 deleate some code-lines not needed
 
 
 from modules import cbpi, app
@@ -142,8 +144,6 @@ def updateRRDdatabase(kid):
 def updateRRDdatabaseFerment(fid):
     #fid is the TFT_Fermenter_ID from parameters
     pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd")
-    
-    #rrdtool.update(pfad, "N:%s" % (femTemp(fid)));
     rrdtool.update(pfad, "N:%s:%s" % (femTemp(fid),femTargTemp(fid)));
     #cbpi.app.logger.info('TFTDisplay  - rrdferm update')
     
@@ -313,7 +313,7 @@ def initTFT(app):
     except:
         pass
     
-#end of init    
+    #end of init    
     
     @cbpi.backgroundtask(key="TFT240x320job", interval=5)
     def TFT240x320job(api):
@@ -344,13 +344,11 @@ def initTFT(app):
         
         if s is not None or StartscreenOn == "off" or is_fermenter_step_running() == "active":
             #Brewing Starts and so Chart starts or startscreen is off
-            # before we check if fermentation mode is runnning
+            # before, we check if fermentation mode is runnning
             if is_fermenter_step_running() == "active":
 
-                #femTemp(TFTfermenterID)
                 cbpi.app.logger.info("TFTDisplay  - Fermentation is running")
                 updateRRDdatabaseFerment(TFTfermenterID)
-                femTargTemp(TFTfermenterID)#test
                 graphAsFileFerm()
                 imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.png')
                 TFT240x320(imagefile)
