@@ -64,7 +64,7 @@ Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandl
 
 You can install it with the Raspi software installer:
 
-(1)-- Goto options      (in German Einstellungen)
+(1) -- Goto options      (in German Einstellungen)
 
 (2)-- Add / Remove Software
 
