@@ -39,7 +39,7 @@ You have to install the Adafruit_Python_ILI9341 and some other packages.
 
 Most of them are already installed but they all have to be present.
 After that the rrdtool has to be installed with the Raspi software-installer.
-In the end you have to install the addon.
+In the end you have to install the TFTDisplay addon in CraftBerrPi3 section addon.
 Dont forget the reboot.
 
 ## 1. Install Adafruit_Python_ILI9341 for TFTDisplay_240x320:
