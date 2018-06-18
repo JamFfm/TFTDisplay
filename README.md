@@ -1,9 +1,9 @@
 # TFTDisplay add-on for CraftBeerPi 3
 
 
-CraftbeerPi3 addon for a 2.2" or 2.8" TFT Display 240 x 320 with ILI9341 driver
+CraftBeerPi 3 addon for a 2.2" or 2.8" TFT Display 240 x 320 with ILI9341 driver
 
-With this add-on you can display a Temperature Graph of a Kettle (its sensor) or of a fermenter on a 240 x 320 TFT SPI Display.
+With this add-on you can display a temperature graph of a **kettle** (its sensor) or of a **fermenter** on a 240 x 320 TFT SPI Display.
 It is based on the ILI9341 controller.
 
 The modul can display a temperatur graph by the help of rrdtool.
