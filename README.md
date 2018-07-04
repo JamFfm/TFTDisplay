@@ -70,13 +70,13 @@ You can install it with the Raspi software installer:
 
 (2)-- Add / Remove Software
 
-(3)-- Key in "rrdtools" and hit enter
+(3)-- Key in "rrd" and hit enter
 
 (4)-- choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
 
 (5)-- hit apply
 
-rrdtool should be installed.
+you will be asked for the password and after that rrdtool should be installed.
 
 ## 3. You have to install the CBPI3 Addon (it is now official)
 
