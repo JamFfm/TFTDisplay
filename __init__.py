@@ -108,7 +108,7 @@ def TFT240x320(imagefile):
     
 def createRRDdatabase():
     rrdtool.create(
-    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd",
+    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd",
     "--start", "now",
     "--step", "5",
     "DS:tempsensor:GAUGE:30:-10:110",
@@ -121,7 +121,7 @@ def createRRDdatabase():
 
 def createRRDdatabaseFerment():
     rrdtool.create(
-    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd",
+    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd",
     "--start", "now",
     "--step", "5",
     "DS:tempsensor:GAUGE:30:-10:110",
@@ -136,19 +136,19 @@ def createRRDdatabaseFerment():
 
 def updateRRDdatabase(kid):
     #kid is the TFT_Kettle_ID from parameters
-    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd")
+    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")
     
     rrdtool.update(pfad, "N:%s" % (Temp(kid)));
     #cbpi.app.logger.info('TFTDisplay  - rrd update')
 
 def updateRRDdatabaseFerment(fid):
     #fid is the TFT_Fermenter_ID from parameters
-    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd")
+    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd")
     rrdtool.update(pfad, "N:%s:%s" % (femTemp(fid),femTargTemp(fid)));
     #cbpi.app.logger.info('TFTDisplay  - rrdferm update')
     
 def graphAsFile():
-    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png"
+    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.png"
     rrdtool.graph (path,
     "--imgformat", "PNG",
         #"--start", "-40m",
@@ -168,13 +168,13 @@ def graphAsFile():
         "--no-legend",
         "--slope-mode",     #smoother line
         "--use-nan-for-all-missing-data",
-        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd:tempsensor:AVERAGE",
+        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd:tempsensor:AVERAGE",
         "LINE3:temp#ff0000:tempsensor")
     #cbpi.app.logger.info('TFTDisplay  - graph created')
     #https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html here all options are listed
 
 def graphAsFileFerm():
-    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.png"
+    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.png"
     rrdtool.graph (path,
     "--imgformat", "PNG",
         "--start", "%s" % str((TFTduration)),
@@ -187,16 +187,16 @@ def graphAsFileFerm():
         "--no-legend",
         "--slope-mode",     #smoother line
         "--use-nan-for-all-missing-data",
-        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd:tempsensor:AVERAGE",
-        "DEF:targtemp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd:targettemp:AVERAGE",
+        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd:tempsensor:AVERAGE",
+        "DEF:targtemp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd:targettemp:AVERAGE",
         "LINE3:temp#ff0000:tempsensor",
         "LINE3:targtemp#0000ff:targettemp")
     #cbpi.app.logger.info('TFTDisplay  - fermgraph created')
     #https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html here all options are listed
 
 def rrdDateiVorhanden():
-    my_file = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.rrd")
-    my_fermfile = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.rrd")
+    my_file = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")
+    my_fermfile = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd")
     cbpi.app.logger.info('TFTDisplay  - check if file brewtemp.rrd exists?')
 
     if my_file.exists():
@@ -350,13 +350,13 @@ def initTFT(app):
                 cbpi.app.logger.info("TFTDisplay  - Fermentation is running")
                 updateRRDdatabaseFerment(TFTfermenterID)
                 graphAsFileFerm()
-                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/fermtemp.png')
+                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.png')
                 TFT240x320(imagefile)
                 #thread.start_new_thread(TFT240x320,(imagefile,))
                 
             else:
                 updateRRDdatabase(id3)
-                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay_240x320/brewtemp.png')
+                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.png')
                 graphAsFile()
 
                 TFT240x320(imagefile)
