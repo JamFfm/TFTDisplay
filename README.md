@@ -72,9 +72,11 @@ You can install it with the Raspi software installer:
 
 (3)-- Key in "rrd" and hit enter
 
-(4)-- choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
+(4)-- choose "time-series data storage and display system (runtime library)"->librrd8-1.6.0-1+b1
 
-(5)-- hit apply
+(5)-- choose "time-series data storage and display system (Phyton Interface)"->python-rrdtool-1.6.0-1+b1
+
+(6)-- hit apply
 
 you will be asked for the password and after that rrdtool should be installed.
 
@@ -82,7 +84,7 @@ you will be asked for the password and after that rrdtool should be installed.
 
 (1)-- just install from the add-on screen in Craftbeerpi3
 
-(2)-- reboot the CBPi3 Software or the raspi
+(2)-- reboot the raspi
 
 # Usage
 
@@ -128,6 +130,8 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - fixed problem with too many files.
 - fixed: only for brewing-kettles not for fermentation
+- fixed wrong filepathes due to a different folder name TFTDisplay->TFTDispaly320*200
+
 
 # Support
 
