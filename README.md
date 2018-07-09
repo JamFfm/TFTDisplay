@@ -130,7 +130,7 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - fixed problem with too many files.
 - fixed: only for brewing-kettles not for fermentation
-- fixed wrong filepathes due to a different folder name TFTDisplay->TFTDispaly320*200
+- fixed wrong filepathes due to a different folder name TFTDisplay240x320-->TFTDisplay
 
 
 # Support
