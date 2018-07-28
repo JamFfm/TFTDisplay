@@ -6,11 +6,17 @@ CraftBeerPi 3 addon for a 2.2" or 2.8" TFT Display 240 x 320 with ILI9341 driver
 With this add-on you can display a temperature graph of a **kettle** (its sensor) or of a **fermenter** on a 240 x 320 TFT SPI Display.
 It is based on the ILI9341 controller.
 
-The modul can display a temperatur graph by the help of rrdtool.
+The modul can display a temperatur graph by the help of rrdtool or show just bis numbers so you can watch temperature from a bit more fare away.
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplay 320x240")
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Ferment.jpg "FermTFTDisplay 320x240")
+
+![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Startscreen1.JPG  "Startcsceen")
+
+![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graphmode.JPG  "Graphikmode")
+
+![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/DigitMode.JPG  "Digitmode")
 
 ## I followed this link **only** for wiring
 
@@ -93,6 +99,8 @@ You can change width, hight and fontsize. I recomment 384, 400, 16.
 Changing these parameters do not need a reboot and are used at once.
 To change a temp sensor you can add it to the kettle- or fermenter in CBPI3 and/or you change the kettle- or fermenter ID in parameters. Once you start fermentation steps the fermentation graph is shown (red) with the coresponding target temperature (blue). If you only like to display a graph during Brewing steps or fermentaion steps then turn on the startscreen which will display the CraftbeerPi logo in standby mode
 
+In the digit mode you can watch the current temperature and target temperature of the choosen kettle (ID) (look at: TFT_Kettle_ID in parameters) from distance. When the current-temperature is close to the target-temperature (<2°C or °F) then the digits turn red. So you can change the target-temperature and the coulour changes. Is the target-temperature = 0.00°C or °F then the current-temperature stays white. Made that because white is better readable from distance and sometimes no target-temperature is choosen. 
+
 ## Parameter
 
 There are several parameter to change the display behavior
@@ -107,17 +115,20 @@ Default is 16
 - TFT_Hight: Hight of the image displayed in pixel.
 Default is 400
 
-- TFT_Kettle_ID: The id of the kettle whose tempsensor is shown in the graph. The kettle id is in the sequence the kettles are listed in "Hardware Settings" beginning with 1
+- TFT_Kettle_ID: The id of the kettle whose tempsensor is shown in the graph. The kettle id is in the sequence the kettles are listed in "Hardware Settings" beginning with 1. This has affect in Graph- or Digit- mode.
 
-- TFT_StartscreenOn: whether the CraftBerrPi Logo is shown at the beginning and graph begins at start Steps ("on"), or showing graph at start ("off")
+- TFT_StartscreenOn: whether the CraftBerrPi Logo is shown at the beginning and graph begins at start Steps ("on"), or showing graph at start ("off"). This works regarless if Graph- or Digit- mode.
 
 - TFT_Width: width of the image displayed in pixel.
 Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - TFT_Fermenter_ID: The id of the fermenter whose tempsensor is shown in the graph. The kettle id is in the sequence the fermenters are listed in "Hardware Settings" beginning with 1. Here also the Target Temp is shown.
 
+- TFT_digitOn: whether the plain numbers are shown. You can watch current- and target temperature. The kettle ID is shown too. You can change it in TFT_Kettle_ID. If this parameter is "off" the Graph mode is on.
+
 # Known Problems
 
+- Digit Mode is not ready for fermentation and °F
 - The responce to clicks in the gui may become a little bit delayed
 - X-axis is not shown properly at some TFT_Duration values
 - I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color) screen. After that, change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code. So this is only a information to the ones who know to read the code.
@@ -129,7 +140,7 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 # Fixed Problems
 
 - fixed problem with too many files.
-- fixed: only for brewing-kettles not for fermentation
+- fixed: Graph mode only for brewing-kettles not for fermentation
 - fixed wrong filepathes due to a different folder name TFTDisplay240x320-->TFTDisplay
 
 
