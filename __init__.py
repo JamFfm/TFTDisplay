@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# TFTDisplay Version 1.2.1.6
+# TFTDisplay Version 1.3.1.0
 # Assembled by JamFfm
 #
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
@@ -37,6 +37,11 @@
 # 09.04.2018 Ferm or Brew modus displayed in Title, finished fermentation support
 # 11.04.2018 Added Target Temp-Graph in Ferm mode
 # 04.05.2018 deleate some code-lines not needed
+# 09.06.2018 changed File path name because folfer changed from TFTDisplay240x320 to TFTDisplay
+# 09.06-2018 finished assembly in the brewcase, fixed a missing installation step in readme
+# 27.07.2018 added digit modus
+# 28.07.2018 added kettle no in digit display
+
 
 
 from modules import cbpi, app
@@ -105,6 +110,99 @@ def TFT240x320(imagefile):
 
     # Close SPI Connection to avoid "too many Ffiles open error"
     spidevice.close()
+
+def Digit(kettleID):
+    global used
+    global DC
+    global RST
+    
+    if used == 0:
+        DC = 18
+        RST = 25
+        used = 1
+
+    elif used == 1:
+        DC = 24
+        RST = 25
+        used = 2
+
+    else:
+        used = 3
+
+    SPI_PORT = 0
+    SPI_DEVICE = 0
+
+    #create spi connection
+    spidevice = SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
+    # Create TFT LCD display class
+    disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
+    
+    # Initialize display only twice
+    global used
+    if used < 3:
+        disp.begin()        
+    else:
+        pass
+    # Clear the display to a black background.
+    # Can pass any tuple of red, green, blue values (from 0 to 255 each).
+    disp.clear((0, 0, 0))
+
+    # Get a PIL Draw object to start drawing on the display buffer.
+    draw = disp.draw()
+
+    # Draw a line
+    #draw.line((120, 0, 120, 320), fill=(0,255,0), width=4)
+    
+    font = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 80)
+    fontmin = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 20)
+    
+
+    def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
+        # Get rendered font width and height.
+        draw = ImageDraw.Draw(image)
+        width, height = draw.textsize(text, font=font)
+        # Create a new image with transparent background to store the text.
+        textimage = Image.new('RGBA', (width, height), (0,0,0,0))
+        # Render the text.
+        textdraw = ImageDraw.Draw(textimage)
+        textdraw.text((0,0), text, font=font, fill=fill)
+        # Rotate the text image.
+        rotated = textimage.rotate(angle, expand=1)
+        # Paste the text into the image, using it as a mask for transparency.
+        image.paste(rotated, position, rotated)
+
+    
+    TextDigit = (u"%6.2f%s" % (float(Temp(kettleID)),(u"°C")))
+    
+    TextDigitSetTemp = (u"%6.2f%s" % (float(TempTargTemp(kettleID)),(u"°C")))
+
+    #change colour when temp is 2 C close to argettemp
+    Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
+    if  Diff < 2 and (float(TempTargTemp(kettleID))) != 0:
+        cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
+        fill1 = (255, 0, 0)
+    else:
+        fill1 = (255,255,255)
+    
+    # Write lines of text on the buffer, rotated 90 degrees counter clockwise.
+    draw_rotated_text(disp.buffer, u"Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
+    draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
+    draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
+    draw_rotated_text(disp.buffer, (u"Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+    draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
+    draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
+    draw_rotated_text(disp.buffer, u"Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
+    
+    
+
+    # Write buffer to display hardware, must be called to make things visible on the display!
+    disp.display() 
+       
+     
+
+    # Close SPI Connection to avoid "too many files open error"
+    spidevice.close()
+    
     
 def createRRDdatabase():
     rrdtool.create(
@@ -220,6 +318,13 @@ def Temp(kkid):
     #cbpi.app.logger.info("TFTDisplay  - Temp: %s" % (curTemp))
     return curTemp
 
+def TempTargTemp(temptargid):
+    #cbpi.app.logger.info("TFTDisplay  - Target Temp ermitteln")
+    current_sensor_value_temptargid = (cbpi.cache.get("kettle")[(int(temptargid))].target_temp)
+    targTemp = ("%6.2f" % (float(current_sensor_value_temptargid)))
+    #cbpi.app.logger.info("TFTDisplay  - FermTargTemp: %s" % (targTemp))
+    return targTemp
+
 def femTemp(femid):
     #cbpi.app.logger.info("TFTDisplay  - ferm Temp ermitteln")
     current_sensor_value_femid = (cbpi.get_sensor_value(int(cbpi.cache.get("fermenter").get(int(femid)).sensor)))
@@ -299,6 +404,15 @@ def set_FermentationOn():
         cbpi.app.logger.info("TFTDisplay  - TFT_Fermenter_ID added: %s" % (fermon))
     return fermon
 
+def set_DigitOn():
+    digit = cbpi.get_config_parameter("TFT_digitOn", None)
+    if digit is None:
+        digit = "off"
+        cbpi.add_config_parameter ("TFT_digitOn", "off", "select", "No graph just big digits showing temperature, NO! CBPi reboot required", ["on", "off"])
+        cbpi.app.logger.info("TFTDisplay  - TFT_digitOn added:  %s" % (digit))
+    return digit
+
+
 @cbpi.initalizer(order=3100)
 def initTFT(app):       
 
@@ -310,6 +424,7 @@ def initTFT(app):
         cbpi.app.logger.info("TFTDisplay  - TFTfontsize:        %s" % (set_fontsize()))
         cbpi.app.logger.info("TFTDisplay  - TFTduration:        %s" % (set_duration()))
         cbpi.app.logger.info("TFTDisplay  - TFT_Fermenter_ID:   %s" % (set_FermentationOn()))
+        cbpi.app.logger.info("TFTDisplay  - TFT_DigitOn:        %s" % (set_DigitOn()))
     except:
         pass
     
@@ -339,6 +454,9 @@ def initTFT(app):
 
         global TFTfermenterID
         TFTfermenterID = set_FermentationOn()
+
+        global IsDigitOn
+        IsDigitOn = set_DigitOn()
         
         s = cbpi.cache.get("active_step")
         
@@ -354,7 +472,13 @@ def initTFT(app):
                 TFT240x320(imagefile)
                 #thread.start_new_thread(TFT240x320,(imagefile,))
                 
+            elif IsDigitOn == "on":
+
+                #cbpi.app.logger.info("TFTDisplay  - digitOn   is running")
+                Digit(id3)
+                
             else:
+                
                 updateRRDdatabase(id3)
                 imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.png')
                 graphAsFile()
