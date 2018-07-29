@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
+
 # ILI9341 lib:
 # Copyright (c) 2014 Adafruit Industries
 # Author: Tony DiCola
@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# TFTDisplay Version 1.3.1.0
+# TFTDisplay Version 1.3.3.0
 # Assembled by JamFfm
 #
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
@@ -41,6 +41,8 @@
 # 09.06-2018 finished assembly in the brewcase, fixed a missing installation step in readme
 # 27.07.2018 added digit modus
 # 28.07.2018 added kettle no in digit display
+# 29.07.2018 added Fahrenheit support
+# 29.07.2018 added fermentation support for digit modus
 
 
 
@@ -172,26 +174,53 @@ def Digit(kettleID):
         image.paste(rotated, position, rotated)
 
     
-    TextDigit = (u"%6.2f%s" % (float(Temp(kettleID)),(u"°C")))
-    
-    TextDigitSetTemp = (u"%6.2f%s" % (float(TempTargTemp(kettleID)),(u"°C")))
-
-    #change colour when temp is 2 C close to argettemp
-    Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
-    if  Diff < 2 and (float(TempTargTemp(kettleID))) != 0:
-        cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
-        fill1 = (255, 0, 0)
-    else:
-        fill1 = (255,255,255)
-    
     # Write lines of text on the buffer, rotated 90 degrees counter clockwise.
-    draw_rotated_text(disp.buffer, u"Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
-    draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
-    draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
-    draw_rotated_text(disp.buffer, (u"Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
-    draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
-    draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
-    draw_rotated_text(disp.buffer, u"Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
+    # differnt text for fermentation mode and brew mode
+
+    if is_fermenter_step_running() == "active":
+
+
+        TextDigit = (u"%6.2f%s" % (float(femTemp(kettleID)),(tftunit())))
+    
+        TextDigitSetTemp = (u"%6.2f%s" % (float(femTargTemp(kettleID)),(tftunit())))
+
+        #change colour when temp is 2 C/F away from targettemp
+        Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
+        if  Diff > 2 and (float(TempTargTemp(kettleID))) != 0:
+            cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
+            fill1 = (255, 0, 0)
+        else:
+            fill1 = (255,255,255)
+        
+        draw_rotated_text(disp.buffer, u"Curr. temperature of fermeter", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
+        draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, (u"Temperat. of fermeter no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, u"Target temperat. of fermenter", (215, 0), 90, fontmin, fill=(255,255,0))
+
+    else:
+
+        TextDigit = (u"%6.2f%s" % (float(Temp(kettleID)),(tftunit())))
+    
+        TextDigitSetTemp = (u"%6.2f%s" % (float(TempTargTemp(kettleID)),(tftunit())))
+
+        #change colour when temp is 2 C/F close to targettemp
+        Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
+        if  Diff < 2 and (float(TempTargTemp(kettleID))) != 0:
+            cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
+            fill1 = (255, 0, 0)
+        else:
+            fill1 = (255,255,255)
+
+        draw_rotated_text(disp.buffer, u"Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
+        draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, (u"Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, u"Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
     
     
 
@@ -252,7 +281,7 @@ def graphAsFile():
         #"--start", "-40m",
         "--start", "%s" % str((TFTduration)),
         "--font", "DEFAULT:%s" % str((TFTfontsize)),
-        "--title", "CBPi3 Brew time=%s,Temp [°C]" % str((TFTduration))[1:],
+        "--title", "CBPi3 Brew time=%s,Temp [°%s]" % ((str((TFTduration))[1:]),str(tftunit()[1:])),
         "--grid-dash", "0:10",
         "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
         #"-w 290", "-h 310",                   
@@ -277,7 +306,7 @@ def graphAsFileFerm():
     "--imgformat", "PNG",
         "--start", "%s" % str((TFTduration)),
         "--font", "DEFAULT:%s" % str((TFTfontsize)),
-        "--title", "CBPi3 Ferm time=%s,Temp [°C]" % str((TFTduration))[1:],
+        "--title", "CBPi3 Ferm time=%s,Temp [°%s]" % ((str((TFTduration))[1:]),str(tftunit()[1:])),
         "--grid-dash", "0:10",
         "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
         "--left-axis-format", "%.1lf",
@@ -322,23 +351,27 @@ def TempTargTemp(temptargid):
     #cbpi.app.logger.info("TFTDisplay  - Target Temp ermitteln")
     current_sensor_value_temptargid = (cbpi.cache.get("kettle")[(int(temptargid))].target_temp)
     targTemp = ("%6.2f" % (float(current_sensor_value_temptargid)))
-    #cbpi.app.logger.info("TFTDisplay  - FermTargTemp: %s" % (targTemp))
+    #cbpi.app.logger.info("TFTDisplay  - TargTemp: %s" % (targTemp))
     return targTemp
 
 def femTemp(femid):
     #cbpi.app.logger.info("TFTDisplay  - ferm Temp ermitteln")
     current_sensor_value_femid = (cbpi.get_sensor_value(int(cbpi.cache.get("fermenter").get(int(femid)).sensor)))
     curfemTemp = ("%6.2f" % (float(current_sensor_value_femid)))
-    #cbpi.app.logger.info("TFTDisplay  - Temp: %s" % (curfemTemp))
+    #cbpi.app.logger.info("TFTDisplay  - FermTemp: %s" % (curfemTemp))
     return curfemTemp
 
 def femTargTemp(femtargid):
     #cbpi.app.logger.info("TFTDisplay  - ferm Temp ermitteln")
     current_sensor_value_femtarid = (cbpi.cache.get("fermenter")[(int(femtargid))].target_temp)
     curfemtargTemp = ("%6.2f" % (float(current_sensor_value_femtarid)))
-    cbpi.app.logger.info("TFTDisplay  - FermTargTemp: %s" % (curfemtargTemp))
+    #cbpi.app.logger.info("TFTDisplay  - FermTargTemp: %s" % (curfemtargTemp))
     return curfemtargTemp
 
+def tftunit():
+    unit = u"°%s" % (cbpi.get_config_parameter("unit", None))
+    #cbpi.app.logger.info("TFTDisplay  - TFTunit: %s" % (unit))
+    return unit
 
 def is_fermenter_step_running():
     for key, value2 in cbpi.cache["fermenter_task"].iteritems():
@@ -461,9 +494,20 @@ def initTFT(app):
         s = cbpi.cache.get("active_step")
         
         if s is not None or StartscreenOn == "off" or is_fermenter_step_running() == "active":
-            #Brewing Starts and so Chart starts or startscreen is off
-            # before, we check if fermentation mode is runnning
-            if is_fermenter_step_running() == "active":
+            # either brewing starts and so chart/digit starts or startscreen is off
+            # before, we check if digit mode is on and in which mode
+            # then, we check in which mode to show graph either in fermentation mode or brew mode
+
+            if IsDigitOn == "on":
+
+                #cbpi.app.logger.info("TFTDisplay  - digitOn   is running")
+                if is_fermenter_step_running() == "active":
+                    Digit(TFTfermenterID)
+                else:
+                    Digit(id3)
+
+
+            elif is_fermenter_step_running() == "active":
 
                 cbpi.app.logger.info("TFTDisplay  - Fermentation is running")
                 updateRRDdatabaseFerment(TFTfermenterID)
@@ -471,11 +515,7 @@ def initTFT(app):
                 imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.png')
                 TFT240x320(imagefile)
                 #thread.start_new_thread(TFT240x320,(imagefile,))
-                
-            elif IsDigitOn == "on":
 
-                #cbpi.app.logger.info("TFTDisplay  - digitOn   is running")
-                Digit(id3)
                 
             else:
                 
