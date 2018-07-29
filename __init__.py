@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# TFTDisplay Version 1.3.3.0
+# TFTDisplay Version 1.3.3.1
 # Assembled by JamFfm
 #
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
@@ -43,6 +43,7 @@
 # 28.07.2018 added kettle no in digit display
 # 29.07.2018 added Fahrenheit support
 # 29.07.2018 added fermentation support for digit modus
+# 29.07.2018 fixed a mistake concerning colour in digit fermentatin mode
 
 
 
@@ -151,9 +152,6 @@ def Digit(kettleID):
 
     # Get a PIL Draw object to start drawing on the display buffer.
     draw = disp.draw()
-
-    # Draw a line
-    #draw.line((120, 0, 120, 320), fill=(0,255,0), width=4)
     
     font = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 80)
     fontmin = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 20)
@@ -178,16 +176,16 @@ def Digit(kettleID):
     # differnt text for fermentation mode and brew mode
 
     if is_fermenter_step_running() == "active":
-
-
+        
         TextDigit = (u"%6.2f%s" % (float(femTemp(kettleID)),(tftunit())))
     
         TextDigitSetTemp = (u"%6.2f%s" % (float(femTargTemp(kettleID)),(tftunit())))
 
         #change colour when temp is 2 C/F away from targettemp
-        Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
-        if  Diff > 2 and (float(TempTargTemp(kettleID))) != 0:
-            cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
+        Diff = (float(femTargTemp(kettleID))-float(femTemp(kettleID)))
+        #cbpi.app.logger.info("TFTDisplay  - Diff fermTarget to fermTemp %6.2f" % (Diff))
+
+        if  Diff > 2 or Diff < -2 and (float(femTargTemp(kettleID))) != 0:
             fill1 = (255, 0, 0)
         else:
             fill1 = (255,255,255)
@@ -208,8 +206,10 @@ def Digit(kettleID):
 
         #change colour when temp is 2 C/F close to targettemp
         Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
+        #cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %6.2f" % (Diff))
+
         if  Diff < 2 and (float(TempTargTemp(kettleID))) != 0:
-            cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %s" % (Diff))
+            
             fill1 = (255, 0, 0)
         else:
             fill1 = (255,255,255)
