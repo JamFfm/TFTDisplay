@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# TFTDisplay Version 1.3.3.1
+# TFTDisplay Version 1.3.4.1
 # Assembled by JamFfm
 #
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
@@ -44,6 +44,8 @@
 # 29.07.2018 added Fahrenheit support
 # 29.07.2018 added fermentation support for digit modus
 # 29.07.2018 fixed a mistake concerning colour in digit fermentatin mode
+# 10.08.2018 changed intervall in backgroundtask from 5 to 2
+# 03.09.2018 added sleep(3) at init to avoid peaks at start or restart of CBPi3
 
 
 
@@ -58,6 +60,7 @@ import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 import rrdtool
 import modules
+import time
 
 global used
 used = 0
@@ -73,7 +76,7 @@ def TFT240x320(imagefile):
     global DC
     global RST
     
-    if used == 0:
+    if  used == 0:
         DC = 18
         RST = 25
         used = 1
@@ -83,8 +86,9 @@ def TFT240x320(imagefile):
         RST = 25
         used = 2
 
-    else:
+    else:        
         used = 3
+    pass
 
     SPI_PORT = 0
     SPI_DEVICE = 0
@@ -95,7 +99,6 @@ def TFT240x320(imagefile):
     disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
     
     # Initialize display only twice
-    global used
     if used < 3:
         disp.begin()        
     else:
@@ -131,6 +134,7 @@ def Digit(kettleID):
 
     else:
         used = 3
+    pass
 
     SPI_PORT = 0
     SPI_DEVICE = 0
@@ -141,7 +145,6 @@ def Digit(kettleID):
     disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
     
     # Initialize display only twice
-    global used
     if used < 3:
         disp.begin()        
     else:
@@ -225,10 +228,8 @@ def Digit(kettleID):
     
 
     # Write buffer to display hardware, must be called to make things visible on the display!
-    disp.display() 
-       
-     
-
+    disp.display()
+    
     # Close SPI Connection to avoid "too many files open error"
     spidevice.close()
     
@@ -460,10 +461,12 @@ def initTFT(app):
         cbpi.app.logger.info("TFTDisplay  - TFT_DigitOn:        %s" % (set_DigitOn()))
     except:
         pass
-    
+    #waits until tempprobe shows proper values at start. So no peak at startup
+    time.sleep(3)
+
     #end of init    
     
-    @cbpi.backgroundtask(key="TFT240x320job", interval=5)
+    @cbpi.backgroundtask(key="TFT240x320job", interval=2)
     def TFT240x320job(api):
         ## This is the main job
         
@@ -490,6 +493,8 @@ def initTFT(app):
 
         global IsDigitOn
         IsDigitOn = set_DigitOn()
+
+        global Keepstandby
         
         s = cbpi.cache.get("active_step")
         
@@ -526,22 +531,17 @@ def initTFT(app):
                 TFT240x320(imagefile)
                 #thread.start_new_thread(TFT240x320,(imagefile,))
 
-            global Keepstandby
             Keepstandby = 0
             
         elif StartscreenOn == "on":
             #Standby screen
-
-            global Keepstandby
-            
+           
             if Keepstandby < 2:
                 StandbyPath = "/home/pi/craftbeerpi3/modules/ui/static/logo.png"
                 TFT240x320(StandbyPath)
-                #thread.start_new_thread(TFT240x320,(imagefile))
-                global Keepstandby
                 Keepstandby = Keepstandby + 1
             else:
-                #just keep the image on the scrreen without redraw
+                #just keep the image on the screen without redraw
                 pass      
         else:
             pass
