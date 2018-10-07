@@ -129,11 +129,11 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 # Known Problems
 
 
-- The responce to clicks in the gui may become a little bit delayed
 - X-axis is not shown properly at some TFT_Duration values
 - I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color) screen. After that, change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code. So this is only a information to the ones who know to read the code.
-- can't adjust the brightness and backlight
+- if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I do the first experiments with 5V and a 8 channel levelshifter.
 - ugly code style of a beginner :-)
+- selling mistakes
 
 **Help is welcome**
 
