@@ -99,7 +99,7 @@ You can change width, hight and fontsize. I recomment 384, 400, 16.
 Changing these parameters do not need a reboot and are used at once.
 To change a temp sensor you can add it to the kettle- or fermenter in CBPI3 and/or you change the kettle- or fermenter ID in parameters. Once you start fermentation steps the fermentation graph is shown (red) with the coresponding target temperature (blue). If you only like to display a graph during Brewing steps or fermentaion steps then turn on the startscreen which will display the CraftbeerPi logo in standby mode
 
-In the digit mode you can watch the current temperature and target temperature of the choosen kettle (ID) (look at: TFT_Kettle_ID in parameters) from distance. When the current-temperature is close to the target-temperature (<2°C or °F) then the digits turn red. So you can change the target-temperature and the coulour changes. Is the target-temperature = 0.00°C or °F then the current-temperature stays white. Made that because white is better readable from distance and sometimes no target-temperature is choosen. 
+In the digit mode you can watch the current temperature and target temperature of the choosen kettle (ID) from the distance (look at: TFT_Kettle_ID in parameters). When the current-temperature is close to the target-temperature (<2°C or °F) then the digits turn red. So you can change the target-temperature and the coulour changes. Is the target-temperature = 0.00°C or °F the current-temperature stays white. Made that because white is better readable from distance and sometimes no target-temperature is choosen or needed. 
 
 ## Parameter
 
@@ -131,9 +131,9 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - X-axis is not shown properly at some TFT_Duration values
 - I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color) screen. After that, change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code. So this is only a information to the ones who know to read the code.
-- if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I do the first experiments with 5V and a 8 channel levelshifter.
+- if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I used a 8 channel levelshifter and put the LED Pin of the display to 5V.This results in a much brighter display!.  Have to do a test brewing outside.
 - ugly code style of a beginner :-)
-- selling mistakes
+- spelling mistakes
 
 **Help is welcome**
 
