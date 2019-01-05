@@ -138,6 +138,7 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 - if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I used a 8 channel levelshifter and put the LED Pin of the display to 5V.This results in a much brighter display!.  Have to do a test brewing outside.
 - ugly code style of a beginner :-)
 - spelling mistakes
+- using a different path for craftbeerpi3 like /home/pi/craftbeerpi3 will cause malfunction. So stick to the installation instruction of craftbeerpi3. This behavior is caused by my bad coding stile and may be fixed in a new version.
 
 **Help is welcome**
 
