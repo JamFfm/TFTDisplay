@@ -8,6 +8,10 @@ It is based on the ILI9341 controller.
 
 The modul can display a temperatur graph by the help of rrdtool or show just numbers so you can watch temperature from a bit more distance.
 
+The add-on assumes that craftberrpi3 is installed in the following path according the installation instruction (read.me) of craftberrpi3:
+
+/home/pi/craftbeerpi3
+
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplay 320x240")
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Ferment.jpg "FermTFTDisplay 320x240")
