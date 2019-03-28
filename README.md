@@ -1,3 +1,7 @@
+![](https://img.shields.io/badge/CBPi%203%20addin-under%20development-yellow.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
+
+
+
 # TFTDisplay add-on for CraftBeerPi 3
 
 
@@ -11,6 +15,8 @@ The modul can display a temperatur graph by the help of rrdtool or show just num
 The add-on assumes that craftberrpi3 is installed in the following path according the installation instruction (read.me) of craftberrpi3:
 
 /home/pi/craftbeerpi3
+
+![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/TFTDisplay_Brew.jpg "BrewTFTDisplay 320x240")
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplay 320x240")
 
@@ -146,8 +152,9 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - fixed problem with too many files.
 - fixed: Graph mode only for brewing-kettles not for fermentation
-- fixed wrong filepathes due to a different folder name TFTDisplay240x320-->TFTDisplay
-- fixed Digit Mode is not ready for fermentation and °F
+- fixed: wrong filepathes due to a different folder name TFTDisplay240x320-->TFTDisplay
+- fixed: Digit Mode is not ready for fermentation and °F
+- fixed: Display stayes white after a temporary connection problem (mostly wireing) but after reconnect the display stayes white
 
 
 # Support
