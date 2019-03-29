@@ -18,8 +18,6 @@ The add-on assumes that craftberrpi3 is installed in the following path accordin
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/TFTDisplay_Brew.jpg "BrewTFTDisplay 320x240")
 
-![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Graph.JPG "BrewTFTDisplay 320x240")
-
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Ferment.jpg "FermTFTDisplay 320x240")
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/Startscreen1.JPG  "Startcsceen")
