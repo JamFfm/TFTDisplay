@@ -136,6 +136,8 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - TFT_digitOn: whether the plain numbers are shown. You can watch current- and target temperature. The kettle ID is shown too. You can change it in TFT_Kettle_ID. If this parameter is "off" the Graph mode is on. Default is "off".
 
+- TFT_RedrawTime:sometimes the display turns into white. I assume bad physical connections like wireing. Once that occurs only a reboot of CBPi3 can cure that. During brewing process this is no option. I introduced a redraw of the display at adjustable time. This parameter is the time between the redraws. A redraw is like a two times flash of the Display. It is not exactly sec. So if you have no prolems with white display give this a high number. If you have some troubles with white display then use a small number. Default is 300
+
 # Known Problems
 
 
