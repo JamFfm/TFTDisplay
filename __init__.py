@@ -1,325 +1,378 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+# ILI9341 lib:
+# Copyright (c) 2014 Adafruit Industries
+# Author: Tony DiCola
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+# TFTDisplay Version 1.3.4.1
+# Assembled by JamFfm
+#
+# 14.03.2018 changed DC and RST for init display, change default font size, add title
+# 16.03.2018 added alternative autocale of graph, show XX.x numbers on Y-axis
+# 18.03.2018 optimized code in function updateRRDdatabase(kid) (2 times path)
+# 18.03.2018 add parameter TFT_Duration in parameters so you can choose which period to show
+# 20.03.2018 change init values of createRRDdatabase(), to support long time graphs
+# 20.03.2018 build in first steps for ferment support
+# 21.03.2018 duration is displayed at Title
+# 21.03.2018 change if loop to detect ferm mode, femTemp(femid), set fermentationOn(), etc added
+# 09.04.2018 Ferm or Brew modus displayed in Title, finished fermentation support
+# 11.04.2018 Added Target Temp-Graph in Ferm mode
+# 04.05.2018 deleate some code-lines not needed
+# 09.06.2018 changed File path name because folfer changed from TFTDisplay240x320 to TFTDisplay
+# 09.06-2018 finished assembly in the brewcase, fixed a missing installation step in readme
+# 27.07.2018 added digit modus
+# 28.07.2018 added kettle no in digit display
+# 29.07.2018 added Fahrenheit support
+# 29.07.2018 added fermentation support for digit modus
+# 29.07.2018 fixed a mistake concerning colour in digit fermentatin mode
+# 10.08.2018 changed intervall in backgroundtask from 5 to 2
+# 03.09.2018 added sleep(3) at init to avoid peaks at start or restart of CBPi3
+
+
+
+from modules import cbpi, app
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from pathlib import Path
+import os, re, thread, time
+import Adafruit_ILI9341 as TFT
+import Adafruit_GPIO as GPIO
+import Adafruit_GPIO.SPI as SPI
+import rrdtool
+import modules
 import time
-import logging
-import socket
-import fcntl
-import struct
-import warnings
-import datetime
-import threading
-from time import gmtime, strftime
-from modules import app, cbpi
-from .contextmanagers import cursor, cleared
-from .gpio import CharLCD as GpioCharLCD
-from i2c import CharLCD
 
-#LCDVERSION = '3.7.23'
-#The LCD-library and LCD-driver are taken from RPLCD Project version 1.0.
-#The documentation:   http://rplcd.readthedocs.io/en/stable/ very good and readable.
-#Git is here:         https://github.com/dbrgn/RPLCD.
-#LCD_Address should be something like 0x27, 0x3f etc. See parameters in Craftbeerpi3.
-#To determine address of LCD use comand promt in Raspi: sudo i2cdetect -y 1 or sudo i2cdetect -y 0
-#assembled by JamFfm
-#17.02.2018 add feature to change Multidispaly <-> Singlediplay without CBPI reboot
-#17.02.2018 add feature to change Kettle Id for Singlediplay without CBPI reboot
-#17.02.2018 add feature to change refresh rate for Multidisplay without CBPI reboot
-#17.02.2018 add feature to change refresh rate for Multidisplay in parameters with choose of value from 1-6s because more than 6s is too much delay in switching actors
-#18.02.2018 improve stability (no value of a temp sensor)
-#13.03.2018 display F or C depending on what is choosed in parameters-unit
+global used
+used = 0
+global Keepstandby
+Keepstandby = 0
+global femid
+femid = 0
+global curfemtargTemp
+curfemtargTemp = 0
 
-@cbpi.initalizer(order=3000)
-def init(cbpi):
-
-    global LCDaddress
-    LCDaddress = int(set_lcd_address(),16)
-    cbpi.app.logger.info('LCDDisplay  - LCD_Address %s %s' % (set_lcd_address(),LCDaddress))
+def TFT240x320(imagefile):
+    global used
+    global DC
+    global RST
     
-    #This is just for the logfile at start
-    refreshlog = float(set_parameter_refresh())
-    cbpi.app.logger.info('LCDDisplay  - Refreshrate %s' % (refreshlog))
+    if  used == 0:
+        DC = 18
+        RST = 25
+        used = 1
 
-    #This is just for the logfile at start
-    multidisplaylog = str(set_parameter_multidisplay())
-    cbpi.app.logger.info('LCDDisplay  - Multidisplay %s' % (multidisplaylog))
+    elif used == 1:
+        DC = 24
+        RST = 25
+        used = 2
 
-    #This is just for the logfile at start
-    id1log = int(set_parameter_id1())
-    cbpi.app.logger.info("LCDDisplay  - Kettlenumber used %s" % (id1log))
-
-
-    global lcd
-    try:
-        lcd = lcd(LCDaddress)
-        lcd.create_char(0, bierkrug)
-        lcd.create_char(1, cool)
-    except:
-        cbpi.notify('LCD Address is wrong', 'Change LCD Address in parameters,to detect comand promt in Raspi: sudo i2cdetect -y 1', type = 'danger', timeout=None)
-
-    global lcd_unit
-    try:
-        lcd_unit = cbpi.get_config_parameter("unit", None)
-        cbpi.app.logger.info("LCDDisplay  - unit used %s" % (lcd_unit))
-    except:
-        pass
-
-#end of init    
-
-def lcd(LCDaddress):
-    try:
-        lcd = CharLCD(i2c_expander='PCF8574', address=LCDaddress, port=1, cols=20, rows=4, dotsize=8, charmap='A00', auto_linebreaks=True, backlight_enabled=True)
-        return lcd
-    except:
-        pass
-    
-def set_lcd_address():
-  adr = cbpi.get_config_parameter('LCD_Address', None)
-  if adr is None:
-      cbpi.add_config_parameter('LCD_Address', '0x27', 'string', 'Address of the LCD, CBPi reboot required')
-      adr = cbpi.get_config_parameter('LCD_Address', None)
-  return adr
-
-def set_parameter_refresh():
-  ref = cbpi.get_config_parameter('LCD_Refresh', None)
-  if ref is None:
-      cbpi.add_config_parameter('LCD_Refresh', 3, 'select', 'Time to remain till next display in sec, NO! CBPi reboot required',[1,2,3,4,5,6])
-      ref = cbpi.get_config_parameter('LCD_Refresh', None)
-  return ref
-
-def set_parameter_multidisplay():  
-  multi = cbpi.get_config_parameter('LCD_Multidisplay', None)
-  if multi is None:
-      cbpi.add_config_parameter('LCD_Multidisplay', 'on', 'select', 'Toggle between all Kettles or show only one Kette constantly, NO! CBPi reboot required', ['on','off'])
-      multi=cbpi.get_config_parameter('LCD_Multidisplay', None)
-  return multi
-
-def set_parameter_id1():  
-  kid1 = cbpi.get_config_parameter("LCD_Singledisplay", None)
-  if kid1 is None:
-      cbpi.add_config_parameter("LCD_Singledisplay", 1, "number", "Choose Kettle (Number), NO! CBPi reboot required")
-      kid1 = cbpi.get_config_parameter('LCD_Singledisplay', None)
-  return kid1
-
-def set_lcd_unit():
-    try:
-        slu = cbpi.get_config_parameter("unit", None)
-    except:
-        pass
-
-#beerglass symbol
-bierkrug = (
-              0b11100,
-              0b00000,
-              0b11100,
-              0b11111,
-              0b11101,
-              0b11101,
-              0b11111,
-              0b11100
-        )
-#cooler symbol should look like icecubes
-cool = (
-            0b00011,
-            0b11011,
-            0b11000,
-            0b00000,
-            0b00110,
-            0b00110,
-            0b11011,
-            0b11011
-        )
-
-def get_ip(interface):
-    ip_addr = 'Not connected'
-    so = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        ip_addr = socket.inet_ntoa(fcntl.ioctl(so.fileno(), 0x8915, struct.pack('256s', interface[:15]))[20:24])
-    finally:
-        return ip_addr
-
-def get_version_fo(path):
-    version = ""
-    try:
-        if path is not "":
-            fo = open(path, "r")
-        else:
-            fo = open("/home/pi/craftbeerpi3/config/version.yaml","r")
-        version = fo.read();
-        fo.close()
-    finally:
-        return version
-cbpi_version = (get_version_fo(""))
-
-def show_multidisplay(refresh):
-    
-    s = cbpi.cache.get("active_step")
-    for idx, value in cbpi.cache["kettle"].iteritems():
-        current_sensor_value = (cbpi.get_sensor_value(value.sensor))
-
-        heater_of_kettle = int(cbpi.cache.get("kettle").get(value.id).heater)
-        heater_status = int(cbpi.cache.get("actors").get(heater_of_kettle).state)
-
-        line1 = (u'%s' % (s.name,))[:20]
-
-        #line2 when steptimer is runnig show remaining time and kettlename
-        if s.timer_end is not None:
-            time_remaining = time.strftime(u"%H:%M:%S", time.gmtime(s.timer_end - time.time()))
-            line2 = ((u"%s %s" % ((value.name).ljust(12)[:11], time_remaining)).ljust(20)[:20])
-        else:
-            line2 = ((u'%s' % (value.name,))[:20])
-
-        #line3 
-        line3 = (u"Targ. Temp:%6.2f%s%s" % (float(value.target_temp),(u"°"),(lcd_unit)))[:20]
-
-        #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
-        try:
-            line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value),(u"°"),(lcd_unit)))[:20]
-        except:
-            cbpi.app.logger.info("LCDDisplay  - current_sensor_value exception %s" % (current_sensor_value))
-            line4 = (u"Curr. Temp: %s" % ("No Data"))[:20]
-            
-        lcd.clear()
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(line1)
-        lcd.cursor_pos = (0,19)
-        if heater_status != 0:
-            lcd.write_string(u"\x00")           
-        lcd.cursor_pos = (1, 0)
-        lcd.write_string(line2)
-        lcd.cursor_pos = (2, 0)
-        lcd.write_string(line3)
-        lcd.cursor_pos = (3, 0)
-        lcd.write_string(line4)
-        time.sleep(refresh)
+    else:        
+        used = 3
     pass
 
-#variable for on off of the beerglassymbol (BierKrug) do not know better than use semioptimal global var.
-global bk 
-bk = 0
+    SPI_PORT = 0
+    SPI_DEVICE = 0
 
-
-
-def show_singlemode(id1):
-    cbpi.app.logger.info("LCDDisplay  - id1 an Funktion übergeben %s" % (id1))
-    s = cbpi.cache.get("active_step")
-
-    #read the current temperature of kettle with id1 from parameters  
-    current_sensor_value_id1 = (cbpi.get_sensor_value(int(cbpi.cache.get("kettle").get(id1).sensor)))
-                            
-    #get the state of the heater of the current kettle
-    heater_of_kettle = int(cbpi.cache.get("kettle").get(id1).heater)
-    #cbpi.app.logger.info("LCDDisplay  - heater id %s" % (heater_of_kettle))
-
-    heater_status = cbpi.cache.get("actors").get(heater_of_kettle).state
-    #cbpi.app.logger.info("LCDDisplay  - heater status (0=off, 1=on) %s" % (heater_status))
+    #create spi connection
+    spidevice = SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
+    # Create TFT LCD display class
+    disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
     
-    #line1 the stepname
-    line1 = (u'%s' % (s.name,)).ljust(20)[:20]
-    
-    #line2 when steptimer is runnig show remaining time and kettlename
-    if s.timer_end is not None:
-        time_remaining = time.strftime(u"%H:%M:%S", time.gmtime(s.timer_end - time.time()))
-        line2 = ((u"%s %s" % ((cbpi.cache.get("kettle")[id1].name).ljust(12)[:11],time_remaining)).ljust(20)[:20])
+    # Initialize display only twice
+    if used < 3:
+        disp.begin()        
     else:
-        line2 = ((u'%s' % (cbpi.cache.get("kettle")[id1].name)).ljust(20)[:20])
-
-    #line3
-    line3 = (u"Targ. Temp:%6.2f%s%s" % (float(cbpi.cache.get("kettle")[id1].target_temp),(u"°"),(lcd_unit))).ljust(20)[:20]
-
-    #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
-    try:
-        line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value_id1),(u"°"),(lcd_unit))).ljust(20)[:20]
-    except:
-        cbpi.app.logger.info("LCDDisplay  - singlemode current_sensor_value_id1 exception %s" % (current_sensor_value_id1))
-        line4 = (u"Curr. Temp: %s" % (("No Data")))[:20]
+        pass
+        
+    # Load an image
+    image = Image.open(imagefile)
+    #cbpi.app.logger.info('Loading image %s' % (imagefile))
     
-    lcd.cursor_pos = (0, 0)
-    lcd.write_string(line1)
-    lcd.cursor_pos = (0,19)
-    if bk == 0 and heater_status != 0:
-        lcd.write_string(u"\x00")
-        global bk
-        bk = 1    
+    # Resize the image and rotate it so it's 240x320 pixels.
+    image = image.rotate(90).resize((240, 320))
+
+    # Draw the image on the display hardware.
+    disp.display(image)
+
+    # Close SPI Connection to avoid "too many Ffiles open error"
+    spidevice.close()
+
+def Digit(kettleID):
+    global used
+    global DC
+    global RST
+    
+    if used == 0:
+        DC = 18
+        RST = 25
+        used = 1
+
+    elif used == 1:
+        DC = 24
+        RST = 25
+        used = 2
+
     else:
-        lcd.write_string(u" ")
-        global bk
-        bk = 0
-    lcd.cursor_pos = (1, 0)
-    lcd.write_string(line2)
-    lcd.cursor_pos = (2, 0)
-    lcd.write_string(line3)
-    lcd.cursor_pos = (3, 0)
-    lcd.write_string(line4)
+        used = 3
+    pass
 
-def show_fermentation_multidisplay(refresh):
-    for idx, value in cbpi.cache["fermenter"].iteritems():
-        current_sensor_value = (cbpi.get_sensor_value(value.sensor))
-        #INFO value = modules.fermenter.Fermenter
-        #INFO FermenterId = modules.fermenter.Fermenter.id
+    SPI_PORT = 0
+    SPI_DEVICE = 0
 
-        #get the state of the heater of the current fermenter, if there is none, except takes place
-        try:
-            heater_of_fermenter = int(cbpi.cache.get("fermenter").get(value.id).heater)
-            #cbpi.app.logger.info("LCDDisplay  - fheater id %s" % (heater_of_fermenter))
-
-            fheater_status = int(cbpi.cache.get("actors").get(heater_of_fermenter).state)
-            #cbpi.app.logger.info("LCDDisplay  - fheater status (0=off, 1=on) %s" % (fheater_status))
-        except:
-            fheater_status = 0
-
-        #get the state of the cooler of the current fermenter, if there is none, except takes place
-               
-        try:
-            cooler_of_fermenter = int(cbpi.cache.get("fermenter").get(value.id).cooler)
-            #cbpi.app.logger.info("LCDDisplay  - fcooler id %s" % (cooler_of_fermenter))
-
-            fcooler_status = int(cbpi.cache.get("actors").get(cooler_of_fermenter).state)
-            #cbpi.app.logger.info("LCDDisplay  - fcooler status (0=off, 1=on) %s" % (fcooler_status))
-        except:
-            fcooler_status = 0
+    #create spi connection
+    spidevice = SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000)
+    # Create TFT LCD display class
+    disp = TFT.ILI9341(DC, rst=RST, spi=spidevice)   
+    
+    # Initialize display only twice
+    if used < 3:
+        disp.begin()        
+    else:
         pass
+    # Clear the display to a black background.
+    # Can pass any tuple of red, green, blue values (from 0 to 255 each).
+    disp.clear((0, 0, 0))
 
-        line1 = (u'%s' % (value.brewname,))[:20]
-     
-        #line2
-        z = 0
-        for key, value1 in cbpi.cache["fermenter_task"].iteritems():
-            #INFO value1 = modules.fermenter.FermenterStep
-            #cbpi.app.logger.info("LCDDisplay  - value1 %s" % (value1.fermenter_id))
-            if value1.timer_start is not None and value1.fermenter_id == value.id:
-                line2 = interval(value.name,(value1.timer_start- time.time()))
-                z = 1
-            elif z == 0:
-                line2 = (u'%s' % (value.name,))[:20]
-            pass
+    # Get a PIL Draw object to start drawing on the display buffer.
+    draw = disp.draw()
+    
+    font = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 80)
+    fontmin = ImageFont.truetype('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fonts/Share-TechMono.ttf', 20)
+    
+
+    def draw_rotated_text(image, text, position, angle, font, fill=(255,255,255)):
+        # Get rendered font width and height.
+        draw = ImageDraw.Draw(image)
+        width, height = draw.textsize(text, font=font)
+        # Create a new image with transparent background to store the text.
+        textimage = Image.new('RGBA', (width, height), (0,0,0,0))
+        # Render the text.
+        textdraw = ImageDraw.Draw(textimage)
+        textdraw.text((0,0), text, font=font, fill=fill)
+        # Rotate the text image.
+        rotated = textimage.rotate(angle, expand=1)
+        # Paste the text into the image, using it as a mask for transparency.
+        image.paste(rotated, position, rotated)
+
+    
+    # Write lines of text on the buffer, rotated 90 degrees counter clockwise.
+    # differnt text for fermentation mode and brew mode
+
+    if is_fermenter_step_running() == "active":
         
-        #line3    
-        line3 = (u"Targ. Temp:%6.2f%s%s" % (float(value.target_temp),(u"°"),(lcd_unit)))[:20]
+        TextDigit = (u"%6.2f%s" % (float(femTemp(kettleID)),(tftunit())))
+    
+        TextDigitSetTemp = (u"%6.2f%s" % (float(femTargTemp(kettleID)),(tftunit())))
+
+        #change colour when temp is 2 C/F away from targettemp
+        Diff = (float(femTargTemp(kettleID))-float(femTemp(kettleID)))
+        #cbpi.app.logger.info("TFTDisplay  - Diff fermTarget to fermTemp %6.2f" % (Diff))
+
+        if  Diff > 2 or Diff < -2 and (float(femTargTemp(kettleID))) != 0:
+            fill1 = (255, 0, 0)
+        else:
+            fill1 = (255,255,255)
         
-        #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
-        try:
-            line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value),(u"°"),(lcd_unit)))[:20]
-        except:
-            cbpi.app.logger.info("LCDDisplay  - fermentmode current_sensor_value exception %s" % (current_sensor_value))
-            line4 = (u"Curr. Temp: %s" % (("No Data")))[:20]
-        pass
+        draw_rotated_text(disp.buffer, u"Curr. temperature of fermeter", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
+        draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, (u"Temperat. of fermeter no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, u"Target temperat. of fermenter", (215, 0), 90, fontmin, fill=(255,255,0))
 
-        lcd.clear()
-        lcd.cursor_pos = (0, 0)
-        lcd.write_string(line1)
-        lcd.cursor_pos = (0,19)
-        if fheater_status != 0:
-            lcd.write_string(u"\x00")           
-        if fcooler_status != 0:
-            lcd.write_string(u"\x01")       
-        lcd.cursor_pos = (1, 0)
-        lcd.write_string(line2)
-        lcd.cursor_pos = (2, 0)
-        lcd.write_string(line3)
-        lcd.cursor_pos = (3, 0)
-        lcd.write_string(line4)
+    else:
 
-        time.sleep(refresh)
+        TextDigit = (u"%6.2f%s" % (float(Temp(kettleID)),(tftunit())))
+    
+        TextDigitSetTemp = (u"%6.2f%s" % (float(TempTargTemp(kettleID)),(tftunit())))
+
+        #change colour when temp is 2 C/F close to targettemp
+        Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
+        #cbpi.app.logger.info("TFTDisplay  - Diff Target to Temp %6.2f" % (Diff))
+
+        if  Diff < 2 and (float(TempTargTemp(kettleID))) != 0:
+            
+            fill1 = (255, 0, 0)
+        else:
+            fill1 = (255,255,255)
+
+        draw_rotated_text(disp.buffer, u"Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
+        draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, (u"Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
+        draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, u"Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
+    
+    
+
+    # Write buffer to display hardware, must be called to make things visible on the display!
+    disp.display()
+    
+    # Close SPI Connection to avoid "too many files open error"
+    spidevice.close()
+    
+    
+def createRRDdatabase():
+    rrdtool.create(
+    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd",
+    "--start", "now",
+    "--step", "5",
+    "DS:tempsensor:GAUGE:30:-10:110",
+    "RRA:AVERAGE:0.5:1:10d",
+    "RRA:AVERAGE:0.5:60:90d",
+    "RRA:AVERAGE:0.5:3600:540d",
+    "RRA:AVERAGE:0.5:86400:3600d",
+    )
+    cbpi.app.logger.info('TFTDisplay  - RRDdatabase brewtemp.rrd created')
+
+def createRRDdatabaseFerment():
+    rrdtool.create(
+    "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd",
+    "--start", "now",
+    "--step", "5",
+    "DS:tempsensor:GAUGE:30:-10:110",
+    "DS:targettemp:GAUGE:30:-10:110",
+    "RRA:AVERAGE:0.5:1:10d",
+    "RRA:AVERAGE:0.5:60:90d",
+    "RRA:AVERAGE:0.5:3600:540d",
+    "RRA:AVERAGE:0.5:86400:3600d",
+    )  
+    cbpi.app.logger.info('TFTDisplay  - RRDdatabase fermtemp.rrd created')
+
+
+def updateRRDdatabase(kid):
+    #kid is the TFT_Kettle_ID from parameters
+    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")
+    
+    rrdtool.update(pfad, "N:%s" % (Temp(kid)));
+    #cbpi.app.logger.info('TFTDisplay  - rrd update')
+
+def updateRRDdatabaseFerment(fid):
+    #fid is the TFT_Fermenter_ID from parameters
+    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd")
+    rrdtool.update(pfad, "N:%s:%s" % (femTemp(fid),femTargTemp(fid)));
+    #cbpi.app.logger.info('TFTDisplay  - rrdferm update')
+    
+def graphAsFile():
+    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.png"
+    rrdtool.graph (path,
+    "--imgformat", "PNG",
+        #"--start", "-40m",
+        "--start", "%s" % str((TFTduration)),
+        "--font", "DEFAULT:%s" % str((TFTfontsize)),
+        "--title", "CBPi3 Brew time=%s,Temp [°%s]" % ((str((TFTduration))[1:]),str(tftunit()[1:])),
+        "--grid-dash", "0:10",
+        "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
+        #"-w 290", "-h 310",                   
+        #"--full-size-mode",
+        #"--no-gridfit",
+        #"--vertical-label", "Degree Celsius °C",
+        #"--alt-y-grid",
+        #"--color", "CANVAS#000000",
+        "--left-axis-format", "%.1lf",
+        "--alt-autoscale",  #command this line to change the x-axis scale behavior
+        "--no-legend",
+        "--slope-mode",     #smoother line
+        "--use-nan-for-all-missing-data",
+        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd:tempsensor:AVERAGE",
+        "LINE3:temp#ff0000:tempsensor")
+    #cbpi.app.logger.info('TFTDisplay  - graph created')
+    #https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html here all options are listed
+
+def graphAsFileFerm():
+    path = "/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.png"
+    rrdtool.graph (path,
+    "--imgformat", "PNG",
+        "--start", "%s" % str((TFTduration)),
+        "--font", "DEFAULT:%s" % str((TFTfontsize)),
+        "--title", "CBPi3 Ferm time=%s,Temp [°%s]" % ((str((TFTduration))[1:]),str(tftunit()[1:])),
+        "--grid-dash", "0:10",
+        "-w %s" % (str(TFTwith)), "-h %s" % (str(TFThight)),
+        "--left-axis-format", "%.1lf",
+        "--alt-autoscale",  #command this line to change the x-axis scale behavior
+        "--no-legend",
+        "--slope-mode",     #smoother line
+        "--use-nan-for-all-missing-data",
+        "DEF:temp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd:tempsensor:AVERAGE",
+        "DEF:targtemp=/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd:targettemp:AVERAGE",
+        "LINE3:temp#ff0000:tempsensor",
+        "LINE3:targtemp#0000ff:targettemp")
+    #cbpi.app.logger.info('TFTDisplay  - fermgraph created')
+    #https://oss.oetiker.ch/rrdtool/doc/rrdgraph.en.html here all options are listed
+
+def rrdDateiVorhanden():
+    my_file = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")
+    my_fermfile = Path("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.rrd")
+    cbpi.app.logger.info('TFTDisplay  - check if file brewtemp.rrd exists?')
+
+    if my_file.exists():
+        cbpi.app.logger.info('TFTDisplay  - File brewtemp.rrd exists')
+    else:
+        createRRDdatabase()
+        cbpi.app.logger.info('TFTDisplay  - File brewtemp.rrd created')
+    pass
+
+    if my_fermfile.exists():
+        cbpi.app.logger.info('TFTDisplay  - File fermtemp.rrd exists')
+    else:
+        createRRDdatabaseFerment()
+        cbpi.app.logger.info('TFTDisplay  - File fermtemp.rrd created')
+    pass
+
+def Temp(kkid):
+    #cbpi.app.logger.info("TFTDisplay  - Temp ermitteln")
+    current_sensor_value_id3 = (cbpi.get_sensor_value(int(cbpi.cache.get("kettle").get(int(kkid)).sensor)))
+    curTemp = ("%6.2f" % (float(current_sensor_value_id3)))
+    #cbpi.app.logger.info("TFTDisplay  - Temp: %s" % (curTemp))
+    return curTemp
+
+def TempTargTemp(temptargid):
+    #cbpi.app.logger.info("TFTDisplay  - Target Temp ermitteln")
+    current_sensor_value_temptargid = (cbpi.cache.get("kettle")[(int(temptargid))].target_temp)
+    targTemp = ("%6.2f" % (float(current_sensor_value_temptargid)))
+    #cbpi.app.logger.info("TFTDisplay  - TargTemp: %s" % (targTemp))
+    return targTemp
+
+def femTemp(femid):
+    #cbpi.app.logger.info("TFTDisplay  - ferm Temp ermitteln")
+    current_sensor_value_femid = (cbpi.get_sensor_value(int(cbpi.cache.get("fermenter").get(int(femid)).sensor)))
+    curfemTemp = ("%6.2f" % (float(current_sensor_value_femid)))
+    #cbpi.app.logger.info("TFTDisplay  - FermTemp: %s" % (curfemTemp))
+    return curfemTemp
+
+def femTargTemp(femtargid):
+    #cbpi.app.logger.info("TFTDisplay  - ferm Temp ermitteln")
+    current_sensor_value_femtarid = (cbpi.cache.get("fermenter")[(int(femtargid))].target_temp)
+    curfemtargTemp = ("%6.2f" % (float(current_sensor_value_femtarid)))
+    #cbpi.app.logger.info("TFTDisplay  - FermTargTemp: %s" % (curfemtargTemp))
+    return curfemtargTemp
+
+def tftunit():
+    unit = u"°%s" % (cbpi.get_config_parameter("unit", None))
+    #cbpi.app.logger.info("TFTDisplay  - TFTunit: %s" % (unit))
+    return unit
 
 def is_fermenter_step_running():
     for key, value2 in cbpi.cache["fermenter_task"].iteritems():
@@ -328,81 +381,170 @@ def is_fermenter_step_running():
         else:
             pass
 
-def show_standby(ipdet):
-    lcd.cursor_pos = (0, 0)
-    lcd.write_string((u"CraftBeerPi %s" % cbpi_version).ljust(20))
-    lcd.cursor_pos = (1, 0)
-    lcd.write_string((u"%s" % (cbpi.get_config_parameter("brewery_name","No Brewery"))).ljust(20)[:20])
-    lcd.cursor_pos =(2, 0)
-    lcd.write_string((u"IP: %s" % ipdet).ljust(20)[:20])
-    lcd.cursor_pos = (3, 0)
-    lcd.write_string((strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())).ljust(20))
-pass   
+def set_TFTh():  
+    TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
+    if TFThoehe is None:
+        cbpi.add_config_parameter("TFT_Hight", 400, "number", "Choose TFTDisplay hight [pixel], default 400, NO! CBPi reboot required")
+        TFThoehe = (cbpi.get_config_parameter("TFT_Hight", None))
+        cbpi.app.logger.info("TFTDisplay  - TFThoehe added: %s" % (TFThoehe))
+    return TFThoehe
 
-def interval(fermentername, seconds):
-    """
-    gives back intervall as tuppel
-    @return: (weeks, days, hours, minutes, seconds)
-    formats string for line 2
-    returns the formatted string for line 2 of fermenter multiview    
-    """    
-    WEEK = 60 * 60 * 24 * 7
-    DAY = 60 * 60 * 24
-    HOUR = 60 * 60
-    MINUTE = 60
-    
-    weeks = seconds // WEEK
-    seconds = seconds % WEEK
-    days = seconds // DAY
-    seconds = seconds % DAY
-    hours = seconds // HOUR
-    seconds = seconds % HOUR
-    minutes = seconds // MINUTE
-    seconds = seconds % MINUTE
+def set_TFTw():  
+    TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
+    if TFTbr is None:
+        cbpi.add_config_parameter("TFT_Width", 384, "number", "Choose TFTDisplay width [pixel], default 384, NO! CBPi reboot required")
+        TFTbr = (cbpi.get_config_parameter("TFT_Width", None))
+        cbpi.app.logger.info("TFTDisplay  - TFTbr added: %s" % (TFTbr))
+    return TFTbr
 
-    if weeks >= 1:
-        remaining_time = (u"W%d D%d %02d:%02d" % (int(weeks), int(days), int(hours), int(minutes)))
-        return ((u"%s %s" % ((fermentername).ljust(8)[:7],remaining_time))[:20])
-    elif weeks == 0 and days >= 1:
-        remaining_time = (u"D%d %02d:%02d:%02d" % (int(days), int(hours), int(minutes), int(seconds)))
-        return ((u"%s %s" % ((fermentername).ljust(8)[:7],remaining_time))[:20])
-    elif weeks == 0 and days == 0:
-        remaining_time = (u"%02d:%02d:%02d" % (int(hours), int(minutes), int(seconds)))
-        return ((u"%s %s" % ((fermentername).ljust(11)[:10],remaining_time))[:20])
-    else:
+def set_parameter_id3():  
+    TFTid3 = cbpi.get_config_parameter("TFT_Kettle_ID", None)
+    if TFTid3 is None:
+        TFTid3 = 1
+        cbpi.add_config_parameter ("TFT_Kettle_ID", 1, "number", "Choose kettle (Number), NO! CBPi reboot required")      
+        cbpi.app.logger.info("TFTDisplay  - TFTid added: %s" % (TFTid3))
+    return TFTid3
+
+def set_fontsize():
+    fosi = cbpi.get_config_parameter("TFT_Fontsize", None)
+    if fosi is None:
+        fosi = 16
+        cbpi.add_config_parameter ("TFT_Fontsize", 16, "number", "Choose fontsize of grid default is 16, NO! CBPi reboot required")
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fontsize added: %s" % (fosi))
+    return fosi
+
+def set_StartscreenOn():
+    startsc = cbpi.get_config_parameter("TFT_StartscreenOn", None)
+    if startsc is None:
+        startsc = "on"
+        cbpi.add_config_parameter ("TFT_StartscreenOn", "on", "select", "Skip the CBPI Logo and start chart of kettle at power on, NO! CBPi reboot required", ["on", "off"])
+        cbpi.app.logger.info("TFTDisplay  - TFT_StartscreenOn added: %s" % (startsc))
+    return startsc
+
+def set_duration():
+    dur = cbpi.get_config_parameter("TFT_Duration", None)
+    if dur is None:
+        dur = "40m"
+        cbpi.add_config_parameter ("TFT_Duration", "40m", "string", "Choose time elapsed to be displayed, default is 40m (40 minutes), have a look at readme, NO! CBPi reboot required")        
+        cbpi.app.logger.info("TFTDisplay  - TFT_Duration added: %s" % (dur))
+    dur = ("-%s" % (dur))
+    return dur
+
+def set_FermentationOn():
+    fermon = cbpi.get_config_parameter("TFT_Fermenter_ID", None)
+    if fermon is None:
+        fermon = 1
+        cbpi.add_config_parameter ("TFT_Fermenter_ID", 1, "number", "Choose fermenter (Number) NO! CBPi reboot required")
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fermenter_ID added: %s" % (fermon))
+    return fermon
+
+def set_DigitOn():
+    digit = cbpi.get_config_parameter("TFT_digitOn", None)
+    if digit is None:
+        digit = "off"
+        cbpi.add_config_parameter ("TFT_digitOn", "off", "select", "No graph just big digits showing temperature, NO! CBPi reboot required", ["on", "off"])
+        cbpi.app.logger.info("TFTDisplay  - TFT_digitOn added:  %s" % (digit))
+    return digit
+
+
+@cbpi.initalizer(order=3100)
+def initTFT(app):       
+
+    rrdDateiVorhanden()
+    try:
+        cbpi.app.logger.info("TFTDisplay  - TFTKetteID:         %s" % (set_parameter_id3()))
+        cbpi.app.logger.info("TFTDisplay  - TFThight:           %s" % (set_TFTh()))
+        cbpi.app.logger.info("TFTDisplay  - TFTwith:            %s" % (set_TFTw()))
+        cbpi.app.logger.info("TFTDisplay  - TFTfontsize:        %s" % (set_fontsize()))
+        cbpi.app.logger.info("TFTDisplay  - TFTduration:        %s" % (set_duration()))
+        cbpi.app.logger.info("TFTDisplay  - TFT_Fermenter_ID:   %s" % (set_FermentationOn()))
+        cbpi.app.logger.info("TFTDisplay  - TFT_DigitOn:        %s" % (set_DigitOn()))
+    except:
         pass
-    pass
+    #waits until tempprobe shows proper values at start. So no peak at startup
+    time.sleep(3)
 
-##Background Task to load the data
-@cbpi.backgroundtask(key="lcdjob", interval=0.7)
-def lcdjob(api):
-    ## YOUR CODE GOES HERE    
-    ## This is the main job
-
-    if get_ip('wlan0') != 'Not connected':
-        ip = get_ip('wlan0')
-    elif get_ip('eth0') != 'Not connected':
-        ip = get_ip('eth0')
-    elif get_ip('enxb827eb488a6e')!= 'Not connected':
-        ip = get_ip('enxb827eb488a6e')
-    else:
-        ip ='Not connected'
+    #end of init    
     
-    s = cbpi.cache.get("active_step")
-
-    refreshTime = float(set_parameter_refresh())
-
-    multidisplay_status = str(set_parameter_multidisplay())
-    
-    if s is not None and multidisplay_status == "on":    
-        show_multidisplay(refreshTime)
+    @cbpi.backgroundtask(key="TFT240x320job", interval=2)
+    def TFT240x320job(api):
+        ## This is the main job
         
-    elif s is not None and multidisplay_status == "off":       
-        show_singlemode(int(set_parameter_id1()))
+        global id3
+        id3 = set_parameter_id3()
 
-    elif is_fermenter_step_running() == "active":
-        show_fermentation_multidisplay(refreshTime)
+        global TFThight
+        TFThight = set_TFTh()
 
-    else:
-        show_standby(ip)
-    pass
+        global TFTwith
+        TFTwith = set_TFTw()
+
+        global TFTfontsize
+        TFTfontsize = set_fontsize()
+
+        global StartscreenOn
+        StartscreenOn = set_StartscreenOn()
+
+        global TFTduration
+        TFTduration = set_duration()
+
+        global TFTfermenterID
+        TFTfermenterID = set_FermentationOn()
+
+        global IsDigitOn
+        IsDigitOn = set_DigitOn()
+
+        global Keepstandby
+        
+        s = cbpi.cache.get("active_step")
+        
+        if s is not None or StartscreenOn == "off" or is_fermenter_step_running() == "active":
+            # either brewing starts and so chart/digit starts or startscreen is off
+            # before, we check if digit mode is on and in which mode
+            # then, we check in which mode to show graph either in fermentation mode or brew mode
+
+            if IsDigitOn == "on":
+
+                #cbpi.app.logger.info("TFTDisplay  - digitOn   is running")
+                if is_fermenter_step_running() == "active":
+                    Digit(TFTfermenterID)
+                else:
+                    Digit(id3)
+
+
+            elif is_fermenter_step_running() == "active":
+
+                cbpi.app.logger.info("TFTDisplay  - Fermentation is running")
+                updateRRDdatabaseFerment(TFTfermenterID)
+                graphAsFileFerm()
+                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/fermtemp.png')
+                TFT240x320(imagefile)
+                #thread.start_new_thread(TFT240x320,(imagefile,))
+
+                
+            else:
+                
+                updateRRDdatabase(id3)
+                imagefile = ('/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.png')
+                graphAsFile()
+
+                TFT240x320(imagefile)
+                #thread.start_new_thread(TFT240x320,(imagefile,))
+
+            Keepstandby = 0
+            
+        elif StartscreenOn == "on":
+            #Standby screen
+           
+            if Keepstandby < 2:
+                StandbyPath = "/home/pi/craftbeerpi3/modules/ui/static/logo.png"
+                TFT240x320(StandbyPath)
+                Keepstandby = Keepstandby + 1
+            else:
+                #just keep the image on the screen without redraw
+                pass      
+        else:
+            pass
+        
+
+            
