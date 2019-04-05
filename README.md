@@ -71,7 +71,7 @@ Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandl
 
 (5)-- sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
 
-(6)-- cd Adafruit_Python_ILI9341
+(6)-- cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
 
 (7)-- sudo python setup.py install
 
