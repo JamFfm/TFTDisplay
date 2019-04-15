@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
-# TFTDisplay Version 1.3.4.1
+# TFTDisplay Version 1.3.5.5
 # Assembled by JamFfm
 #
 # 14.03.2018 changed DC and RST for init display, change default font size, add title
@@ -46,6 +46,7 @@
 # 29.07.2018 fixed a mistake concerning colour in digit fermentatin mode
 # 10.08.2018 changed intervall in backgroundtask from 5 to 2
 # 03.09.2018 added sleep(3) at init to avoid peaks at start or restart of CBPi3
+# 13.04.2019 added TFTredrawtime to redraw after set time (reactivates display when wiring is toggeling)
 
 
 
@@ -70,11 +71,14 @@ global femid
 femid = 0
 global curfemtargTemp
 curfemtargTemp = 0
+global TFTredrawtime
+TFTredrawtime = 0
 
 def TFT240x320(imagefile):
     global used
     global DC
     global RST
+    global TFTredrawtime
     
     if  used == 0:
         DC = 18
@@ -87,7 +91,7 @@ def TFT240x320(imagefile):
         used = 2
 
     else:        
-        used = 3
+        used = used + 1
     pass
 
     SPI_PORT = 0
@@ -101,8 +105,9 @@ def TFT240x320(imagefile):
     # Initialize display only twice
     if used < 3:
         disp.begin()        
-    else:
-        pass
+    elif used > (TFTredrawtime):  
+        used = 1
+    pass
         
     # Load an image
     image = Image.open(imagefile)
@@ -121,6 +126,7 @@ def Digit(kettleID):
     global used
     global DC
     global RST
+    global TFTredrawtime
     
     if used == 0:
         DC = 18
@@ -133,7 +139,7 @@ def Digit(kettleID):
         used = 2
 
     else:
-        used = 3
+        used = used + 1
     pass
 
     SPI_PORT = 0
@@ -147,8 +153,10 @@ def Digit(kettleID):
     # Initialize display only twice
     if used < 3:
         disp.begin()        
-    else:
-        pass
+    elif used > (TFTredrawtime):
+        used = 1
+    pass
+
     # Clear the display to a black background.
     # Can pass any tuple of red, green, blue values (from 0 to 255 each).
     disp.clear((0, 0, 0))
@@ -264,8 +272,7 @@ def createRRDdatabaseFerment():
 
 def updateRRDdatabase(kid):
     #kid is the TFT_Kettle_ID from parameters
-    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")
-    
+    pfad = ("/home/pi/craftbeerpi3/modules/plugins/TFTDisplay/brewtemp.rrd")    
     rrdtool.update(pfad, "N:%s" % (Temp(kid)));
     #cbpi.app.logger.info('TFTDisplay  - rrd update')
 
@@ -331,14 +338,14 @@ def rrdDateiVorhanden():
         cbpi.app.logger.info('TFTDisplay  - File brewtemp.rrd exists')
     else:
         createRRDdatabase()
-        cbpi.app.logger.info('TFTDisplay  - File brewtemp.rrd created')
+        #cbpi.app.logger.info('TFTDisplay  - File brewtemp.rrd created')
     pass
 
     if my_fermfile.exists():
         cbpi.app.logger.info('TFTDisplay  - File fermtemp.rrd exists')
     else:
         createRRDdatabaseFerment()
-        cbpi.app.logger.info('TFTDisplay  - File fermtemp.rrd created')
+        #cbpi.app.logger.info('TFTDisplay  - File fermtemp.rrd created')
     pass
 
 def Temp(kkid):
@@ -446,6 +453,14 @@ def set_DigitOn():
         cbpi.app.logger.info("TFTDisplay  - TFT_digitOn added:  %s" % (digit))
     return digit
 
+def set_TFT_RedrawTime():
+    rt = cbpi.get_config_parameter("TFT_RedrawTime", None)
+    if rt is None:
+        rt = 120
+        cbpi.add_config_parameter ("TFT_RedrawTime", 120, "number", "Choose time [sec] between redraws (flashes), default is 120sec, NO! CBPi reboot required")
+        cbpi.app.logger.info("TFTDisplay  - TFT_RedrawTime added: %s" % (rt))
+    rt = (int(rt) / 2 )  #intervall of backgroundtask is 2sec so if we want sec in the parameter we devide with 2
+    return rt    
 
 @cbpi.initalizer(order=3100)
 def initTFT(app):       
@@ -459,6 +474,7 @@ def initTFT(app):
         cbpi.app.logger.info("TFTDisplay  - TFTduration:        %s" % (set_duration()))
         cbpi.app.logger.info("TFTDisplay  - TFT_Fermenter_ID:   %s" % (set_FermentationOn()))
         cbpi.app.logger.info("TFTDisplay  - TFT_DigitOn:        %s" % (set_DigitOn()))
+        cbpi.app.logger.info("TFTDisplay  - TFT_RedrawTime:     %s" % (set_TFT_RedrawTime()))
     except:
         pass
     #waits until tempprobe shows proper values at start. So no peak at startup
@@ -467,6 +483,7 @@ def initTFT(app):
     #end of init    
     
     @cbpi.backgroundtask(key="TFT240x320job", interval=2)
+    #if you change intervall please change devisor in set_TFT_RedrawTime()
     def TFT240x320job(api):
         ## This is the main job
         
@@ -493,6 +510,9 @@ def initTFT(app):
 
         global IsDigitOn
         IsDigitOn = set_DigitOn()
+
+        global TFTredrawtime
+        TFTredrawtime = set_TFT_RedrawTime()
 
         global Keepstandby
         
