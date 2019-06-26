@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/CBPi%203%20addin-functionable-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/downloads/JamFfm/TFTDisplay/total.svg)
+![](https://img.shields.io/badge/CBPi%203%20addin-functionable-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
 
 
 
@@ -74,6 +74,8 @@ Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandl
 (6)-- cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
 
 (7)-- sudo python setup.py install
+
+(8)-- sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
 
         
 ## 2. Install rrdtool for python:
