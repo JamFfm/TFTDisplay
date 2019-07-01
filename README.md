@@ -75,7 +75,7 @@ Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandl
 
 (7)-- sudo python setup.py install
 
-(8)-- sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
+(8)-- sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341/Adafruit_ILI9341/ILI9341.py
 
         
 ## 2. Install rrdtool for python:
