@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/CBPi%203%20addin-functionable-V3-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
+![](https://img.shields.io/badge/CBPi%203%20addin-functionableV3-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
 
 
 
@@ -61,14 +61,14 @@ Dont forget the reboot.
 ## 1. Install Adafruit_Python_ILI9341 for TFTDisplay_240x320:
 Copy and paste all lines  (1) to (8) one after the other into the Raspi-commandline and hit enter to install.
 
-'cd craftbeerpi3
-sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
-sudo pip install pathlib
-sudo pip install RPi.GPIO
-sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
-cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
-sudo python setup.py install
-sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341/Adafruit_ILI9341/ILI9341.py'
+'cd craftbeerpi3'
+'sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git'
+'sudo pip install pathlib'
+'sudo pip install RPi.GPIO'
+'sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git'
+'cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341'
+'sudo python setup.py install'
+'sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341/Adafruit_ILI9341/ILI9341.py'
 
         
 ## 2. Install rrdtool for python:
