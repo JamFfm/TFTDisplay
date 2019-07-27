@@ -90,7 +90,7 @@ You can install it with the Raspi software installer:
 
 you will be asked for the password and after that rrdtool should be installed.
 
-## 3. You have to install the CBPI3 Addon (it is now official)
+## 3. You have to install the CBPI3 Addon
 
 (1)-- just install from the add-on screen in Craftbeerpi3
 
