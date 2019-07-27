@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/CBPi%203%20addin-functionable-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
+![](https://img.shields.io/badge/CBPi%203%20addin-functionable-V3-green.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
 
 
 
@@ -59,23 +59,16 @@ In the end you have to install the TFTDisplay addon in CraftBerrPi3 section addo
 Dont forget the reboot.
 
 ## 1. Install Adafruit_Python_ILI9341 for TFTDisplay_240x320:
-Copy and paste all lines  (1) to (7) one after the other into the Raspi-commandline and hit enter to install.
+Copy and paste all lines  (1) to (8) one after the other into the Raspi-commandline and hit enter to install.
 
-(1)-- cd craftbeerpi3
-
-(2)-- sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
-
-(3)-- sudo pip install pathlib
-
-(4)-- sudo pip install RPi.GPIO
-
-(5)-- sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
-
-(6)-- cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
-
-(7)-- sudo python setup.py install
-
-(8)-- sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341/Adafruit_ILI9341/ILI9341.py
+'cd craftbeerpi3
+sudo apt-get install build-essential python-dev python-smbus python-pip python-imaging python-numpy git
+sudo pip install pathlib
+sudo pip install RPi.GPIO
+sudo git clone https://github.com/adafruit/Adafruit_Python_ILI9341.git
+cd /home/pi/craftbeerpi3/Adafruit_Python_ILI9341
+sudo python setup.py install
+sudo chown -R pi /home/pi/craftbeerpi3/Adafruit_Python_ILI9341/Adafruit_ILI9341/ILI9341.py'
 
         
 ## 2. Install rrdtool for python:
@@ -143,10 +136,10 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 
 - X-axis is not shown properly at some TFT_Duration values
 - I noticed that you need first initialise with DC 18 and RST 25 (with RST 23 there will be a false-color image for a short period). This causes a white (or false-color) screen. After that, change to DC 24 and RST 25. The latter are the GPIO I physically connected. The change is done automatically by the code. So this is only a information to the ones who know to read the code.
-- if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I used a 8 channel levelshifter and put the LED Pin of the display to 5V.This results in a much brighter display!.  Have to do a test brewing outside.
+- if LED pin of TFT connected to Raspi GPIO 18 (RPM) brightness is low. This is a problem when using the display outside. It becomes hard to read the display at sunshine. Running the LED pin with plain 3.3V/5V is much better. The display can stand 5V but I am afrait that the Raspi can not. Therefore I used a 8 channel levelshifter and put the LED Pin of the display to 5V.This results in a much brighter display!.  Have to do a test brewing outside.
 - ugly code style of a beginner :-)
 - spelling mistakes
-- using a different path for craftbeerpi3 like /home/pi/craftbeerpi3 will cause malfunction. So stick to the installation instruction of craftbeerpi3. This behavior is caused by my bad coding stile and may be fixed in a new version.
+- using a different path for craftbeerpi3 than /home/pi/craftbeerpi3 will cause malfunction. So stick to the installation instruction of craftbeerpi3. This behavior is caused by my bad coding stile and may be fixed in a new version.
 
 **Help is welcome**
 
