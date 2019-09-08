@@ -26,13 +26,10 @@ The add-on assumes that craftberrpi3 is installed in the following path accordin
 
 ![Test Graph](https://github.com/JamFfm/TFTDisplay/blob/master/DigitMode.JPG  "Digitmode")
 
-## I followed this link **only** for wiring
+## Wiring 
 
-http://blog.riyas.org/2014/07/
 
->BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
-
-> *I put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
+> *Put a 48 Ohm resistor inbetween LED-Pin of TFT and the Raspi Pin.
 
 > update: for me it also worked without the resistor, but I recommend to use one
 
@@ -50,16 +47,6 @@ http://blog.riyas.org/2014/07/
 | -          | RESET        | 6HV       6LV  | GPIO 25        | 22  
 | -          | CS           | 7HV       7LV  | GPIO  8 (CE0)  | 24  
 | -          | -            | 8HV       8LV  | -              | -   
-
-
-## I followed this page how to install and run the modules:
-
-https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
-
-> Please do not update your firmware. It will distroy the Raspi configuration (hopefully not the hardware).
-
-> Have a look at the installation section of this readme. You only have to follow that one.
-
 
 
 # Installation
@@ -170,4 +157,19 @@ Default is 384. This shows the x-axis, if you use 380 x-axis is not shown.
 # Support
 
 Report issues either in this Git section or at Facebook at the [Craftbeerpi group](https://www.facebook.com/groups/craftbeerpi/)
+
+# Credit
+Got the wiring information from this page:
+
+http://blog.riyas.org/2014/07/
+
+>BUT I DID NOT USE THE COMMANDS OF THIS PAGE!
+
+I followed this page how to install and run the modules:
+
+https://learn.adafruit.com/user-space-spi-tft-python-library-ili9341-2-8/usage
+
+> Please do not update your firmware. It will distroy the Raspi configuration (hopefully not the hardware).
+
+> Have a look at the installation section of this readme. You only have to follow that one.
 
