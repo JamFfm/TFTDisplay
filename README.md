@@ -39,7 +39,7 @@ http://blog.riyas.org/2014/07/
 ![Wiring](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
 PowerSuppy  |   TFT Display |  Level Shifter |    RASPI      |  Pin 
-------------|---------------|----------------|---------------|------
+----------- | ------------- | -------------- | ------------- | -----
             |  SDK (MISO)   | 1HV       1LV  | GPIO  9 (MISO)|  21  
             |  LED          | 2HV       2LV  | GPIO 18       |  12  
             |  SCK          | 3HV       3LV  | GPIO 11 (SCLK)|  23  
