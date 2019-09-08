@@ -35,6 +35,8 @@ The add-on assumes that craftberrpi3 is installed in the following path accordin
 
 ![Wiring](https://github.com/JamFfm/TFTDisplay/blob/master/50%20Ohm%20at%20lsd%20pin.png "Wiring")
 
+
+
 | PowerSuppy | TFT Display  | Level Shifter  | RASPI          | Pin 
 | ---------- | ------------ | -------------- | -------------- | -----
 | -          | SDK (MISO)   | 1HV       1LV  | GPIO  9 (MISO) | 21  
@@ -48,6 +50,8 @@ The add-on assumes that craftberrpi3 is installed in the following path accordin
 | -          | CS           | 7HV       7LV  | GPIO  8 (CE0)  | 24  
 | -          | -            | 8HV       8LV  | -              | -   
 
+
+Instead of the Powersuppy it is possible to use 5v of RASPI. It is also possible to connect the display without the LevelShifter. It is the same wiring but leave out the Level Shifter and do not use the 5V powersuppy connection.
 
 # Installation
 
