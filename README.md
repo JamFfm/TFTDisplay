@@ -40,17 +40,16 @@ http://blog.riyas.org/2014/07/
 
 PowerSuppy  |   TFT Display |  Level Shifter |    RASPI       |  Pin 
 ----------- | ------------- | -------------- | -------------- | -----
-            |  SDK (MISO)   | 1HV       1LV  | GPIO  9 (MISO) |  21  
-            |  LED          | 2HV       2LV  | GPIO 18        |  12  
-            |  SCK          | 3HV       3LV  | GPIO 11 (SCLK) |  23  
-            |  SDI (MOSI)   | 4HV       4LV  | GPIO 10 (MOSI) |  19  
+     -      |  SDK (MISO)   | 1HV       1LV  | GPIO  9 (MISO) |  21  
+     -      |  LED          | 2HV       2LV  | GPIO 18        |  12  
+     -      |  SCK          | 3HV       3LV  | GPIO 11 (SCLK) |  23  
+     -      |  SDI (MOSI)   | 4HV       4LV  | GPIO 10 (MOSI) |  19  
      5v     |  VCC          |  HV        LV  | 3v3            |   1  
-            |  GND          | GND       GND  | GND            |      
-            |  DC           | 5HV       5LV  | GPIO 24        |  18  
-            |  RESET        | 6HV       6LV  | GPIO 25        |  22  
-            |  CS           | 7HV       7LV  | GPIO  8 (CE0)  |  24  
-            |               | 8HV       8LV  |                |      
-
+     -      |  GND          | GND       GND  | GND            |  -   
+     -      |  DC           | 5HV       5LV  | GPIO 24        |  18  
+     -      |  RESET        | 6HV       6LV  | GPIO 25        |  22  
+     -      |  CS           | 7HV       7LV  | GPIO  8 (CE0)  |  24  
+     -      |  -            | 8HV       8LV  | -              |  -   
 
 
 ## I followed this page how to install and run the modules:
