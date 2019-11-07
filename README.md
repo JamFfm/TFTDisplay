@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/CBPi%20addin-functionable_for_V3-green.svg) ![](https://img.shields.io/badge/CBPi%20addin-deprecated.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
+![](https://img.shields.io/badge/CBPi%20addin-functionable_for_V3-green.svg) ![](https://img.shields.io/badge/CBPi%20addin-deprecated-red.svg)  ![](https://img.shields.io/github/license/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/last-commit/JamFfm/TFTDisplay.svg?style=flat) ![](https://img.shields.io/github/release-pre/JamFfm/TFTDisplay.svg?style=flat)
 
 
 
