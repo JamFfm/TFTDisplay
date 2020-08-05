@@ -187,9 +187,9 @@ def Digit(kettleID):
 
     if is_fermenter_step_running() == "active":
         
-        TextDigit = (u"%6.2f%s" % (float(femTemp(kettleID)),(tftunit())))
+        TextDigit = ("%6.2f%s" % (float(femTemp(kettleID)),(tftunit())))
     
-        TextDigitSetTemp = (u"%6.2f%s" % (float(femTargTemp(kettleID)),(tftunit())))
+        TextDigitSetTemp = ("%6.2f%s" % (float(femTargTemp(kettleID)),(tftunit())))
 
         # change colour when temp is 2 C/F away from targettemp
         Diff = (float(femTargTemp(kettleID))-float(femTemp(kettleID)))
@@ -200,19 +200,19 @@ def Digit(kettleID):
         else:
             fill1 = (255,255,255)
         
-        draw_rotated_text(disp.buffer, u"Curr. temperature of fermeter", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, "Curr. temperature of fermeter", (0, 0), 90, fontmin, fill=(255,255,255))
         draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
         draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
-        draw_rotated_text(disp.buffer, (u"Temperat. of fermeter no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw_rotated_text(disp.buffer, ("Temperat. of fermeter no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
         draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
         draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
-        draw_rotated_text(disp.buffer, u"Target temperat. of fermenter", (215, 0), 90, fontmin, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, "Target temperat. of fermenter", (215, 0), 90, fontmin, fill=(255,255,0))
 
     else:
 
-        TextDigit = (u"%6.2f%s" % (float(Temp(kettleID)), (tftunit())))
+        TextDigit = ("%6.2f%s" % (float(Temp(kettleID)), (tftunit())))
     
-        TextDigitSetTemp = (u"%6.2f%s" % (float(TempTargTemp(kettleID)), (tftunit())))
+        TextDigitSetTemp = ("%6.2f%s" % (float(TempTargTemp(kettleID)), (tftunit())))
 
         # change colour when temp is 2 C/F close to targettemp
         Diff = (float(TempTargTemp(kettleID))-float(Temp(kettleID)))
@@ -223,13 +223,13 @@ def Digit(kettleID):
         else:
             fill1 = (255,255,255)
 
-        draw_rotated_text(disp.buffer, u"Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
+        draw_rotated_text(disp.buffer, "Current temperature of kettle", (0, 0), 90, fontmin, fill=(255,255,255))
         draw_rotated_text(disp.buffer, TextDigit, (20, 10), 90, font, fill1)
         draw.line((105, 0, 105, 320), fill=(0,255,0), width=3)
-        draw_rotated_text(disp.buffer, (u"Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
+        draw_rotated_text(disp.buffer, ("Temperatures of kettle no %s " % (kettleID)), (110, 0), 90, fontmin, fill=(0,255,0))
         draw.line((135, 0, 135, 320), fill=(0,255,0), width=3)
         draw_rotated_text(disp.buffer, TextDigitSetTemp, (135, 10), 90, font, fill=(255,255,0))
-        draw_rotated_text(disp.buffer, u"Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
+        draw_rotated_text(disp.buffer, "Target temperature of kettle", (215, 0), 90, fontmin, fill=(255,255,0))
 
     # Write buffer to display hardware, must be called to make things visible on the display!
     disp.display()
@@ -376,12 +376,12 @@ def femTargTemp(femtargid):
     return curfemtargTemp
 
 def tftunit():
-    unit = u"°%s" % (cbpi.get_config_parameter("unit", None))
+    unit = "°%s" % (cbpi.get_config_parameter("unit", None))
     # cbpi.app.logger.info("TFTDisplay  - TFTunit: %s" % (unit))
     return unit
 
 def is_fermenter_step_running():
-    for key, value2 in cbpi.cache["fermenter_task"].items():
+    for key, value2 in list(cbpi.cache["fermenter_task"].items()):
         if value2.state == "A":
             return "active"
         else:
